@@ -1,10 +1,10 @@
 // config.js
 module.exports = {
     database: {
-      user: 'postgres',
-      host: 'localhost',
+      user: 'thepankh_user',
+      host: 'dpg-cqns9k5svqrc73fr56q0-a',
       database: 'thepankh',
-      password: '12345678',
+      password: 'E8SXJSDjPBIjN0aBC75QXVF1BmYmm2kG',
       port: 5432,
     },
     jwtSecret: 'thisissecretconversationroomdontinterfere',
