@@ -79,7 +79,32 @@ pool.on("error", (err) => {
 const server = app.listen(PORT, (req, res) => {
   console.log(`Server is working on ${host}:${PORT}`);
 });
+const createTable = async () => {
+  const createTableQuery = `
+    CREATE TABLE IF NOT EXISTS users (
+      id VARCHAR(40) PRIMARY KEY NOT NULL,
+      username VARCHAR(100) NOT NULL,
+      password VARCHAR(100) NOT NULL,
+      phonenumber VARCHAR(12) NOT NULL,
+      role VARCHAR(20) NOT NULL,
+      profile_picture_name VARCHAR(500) NOT NULL,
+      profile_picture_path VARCHAR(500) NOT NULL,
+      createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    );
+  `;
 
+  try {
+    const client = await pool.connect();
+    await client.query(createTableQuery);
+    console.log("Table 'users' created successfully");
+  } catch (err) {
+    console.error('Error creating table', err.stack);
+  } finally {
+    pool.end();
+  }
+};
+
+createTable();
 // // unhandled promise rejection
 process.on("unhandledRejection", (err) => {
   console.log(`Error : ${err.message}`);
