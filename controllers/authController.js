@@ -4,17 +4,21 @@ const pool = require('../db');
 const jwt = require('jsonwebtoken');
 const config = require('../config/config');
 const uuid = require('uuid');
-
+// const cloudinary = require("cloudinary");
 
 const registerUser = async (req, res) => {
   try {
       // Process user registration
       const { username, password,phonenumber,role } = req.body;
       const hashedPassword = await bcrypt.hash(password, 10);
-      const imagePath = req.file.path;
-      const filename = req.file.filename;
       const id  = uuid.v4();
-      const newUser = await pool.query('INSERT INTO users (id,username,password,phonenumber,role, profile_picture_name,profile_picture_path) VALUES ($1, $2, $3,$4,$5,$6,$7) RETURNING *', [id,username, hashedPassword,phonenumber, role, filename, imagePath]);
+      // const myCloud = await cloudinary.v2.uploader.upload(file, {
+      //   folder: "thepankh/users",
+      //   width: 1000,
+      //   height: 1000,
+      //   Crop: "fill",
+      // });
+      const newUser = await pool.query('INSERT INTO users (id,username,password,phonenumber,role, profile_picture_name,profile_picture_path) VALUES ($1, $2, $3,$4,$5,$6,$7) RETURNING *', [id,username, hashedPassword,phonenumber, role, 'this is test', 'this is test']);
       
       res.status(201).json(newUser.rows[0]);
   } catch (error) {
