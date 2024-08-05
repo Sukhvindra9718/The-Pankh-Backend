@@ -19,7 +19,7 @@ readdirSync("./routes").map((route) =>
 app.use("/public", express.static(path.join(__dirname, "public")));
 
 // app.use(cors());
-app.use(cors({ origin: "http://localhost:3001" }));
+app.use(cors({ origin: "https://thepankh.info" }));
 app.use(express.json({ limit: "50mb" }));
 
 // Import Routes
