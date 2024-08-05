@@ -8,8 +8,6 @@ exports.createTestimonial = async (req, res) => {
     const { name, role, comment, file } = req.body;
     const myCloud = await cloudinary.v2.uploader.upload(file, {
       folder: "thepankh/testimonial",
-      width: 1000,
-      height: 1000,
       Crop: "fill",
     });
     const id = uuid.v4();
@@ -112,8 +110,6 @@ exports.updateTestimonial = async (req, res) => {
       await cloudinary.v2.uploader.destroy(fileid);
       const myCloud = await cloudinary.v2.uploader.upload(file, {
         folder: "thepankh/testimonial",
-        width: 1000,
-        height: 1000,
         Crop: "fill",
       });
       await pool.query(

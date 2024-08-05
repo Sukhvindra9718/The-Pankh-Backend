@@ -19,8 +19,6 @@ exports.createVolunteer = async (req, res) => {
     } = req.body;
     const myCloud = await cloudinary.v2.uploader.upload(file, {
       folder: "thepankh/volunteer",
-      width: 1000,
-      height: 1000,
       Crop: "fill",
     });
     const id = uuid.v4();
@@ -144,8 +142,6 @@ exports.updateVolunteer = async (req, res) => {
       await cloudinary.v2.uploader.destroy(fileid);
       const myCloud = await cloudinary.v2.uploader.upload(file, {
         folder: "thepankh/volunteer",
-        width: 1000,
-        height: 1000,
         Crop: "fill",
       });
       await pool.query(

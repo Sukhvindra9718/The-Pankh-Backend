@@ -11,8 +11,6 @@ exports.createNews = async (req, res) => {
     const id = uuid.v4();
     const myCloud = await cloudinary.v2.uploader.upload(file, {
       folder: "thepankh/news",
-      width: 1000,
-      height: 1000,
       Crop: "fill",
     });
     await pool.query(
