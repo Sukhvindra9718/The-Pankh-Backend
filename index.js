@@ -20,7 +20,7 @@ app.use("/public", express.static(path.join(__dirname, "public")));
 
 // app.use(cors());
 if (config.NODE_ENV === "production") {
-  app.use(cors({ origin: "https://thepankh.info/" }));
+  app.use(cors({ origin: "https://thepankh.info" }));
 } else {
   app.use(cors({ origin: "http://localhost:3001" }));
 }
