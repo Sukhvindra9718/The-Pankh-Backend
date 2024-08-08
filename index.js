@@ -13,11 +13,17 @@ const host = os.hostname();
 const pool = require("./db");
 const cloudinary = require("cloudinary");
 
-readdirSync("./routes").map((route) => app.use("/api", require("./routes/" + route)));
+readdirSync("./routes").map((route) =>
+  app.use("/api", require("./routes/" + route))
+);
 app.use("/public", express.static(path.join(__dirname, "public")));
 
 // app.use(cors());
-app.use(cors({ origin: "http://localhost:3001" }));
+if (config.NODE_ENV === "production") {
+  app.use(cors({ origin: "https://thepankh.info/" }));
+} else {
+  app.use(cors({ origin: "http://localhost:3001" }));
+}
 app.use(express.json({ limit: "50mb" }));
 
 // Import Routes
@@ -114,12 +120,11 @@ const createNewsTable = async () => {
     await client.query(createTableQuery);
     console.log("Table 'news' created successfully");
   } catch (err) {
-    console.error('Error creating table', err.stack);
+    console.error("Error creating table", err.stack);
   } finally {
-
   }
 };
- 
+
 // const DeleteNewsTable = async () => {
 //   const query = 'DROP TABLE IF EXISTS news';
 
