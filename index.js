@@ -71,29 +71,29 @@ pool.connect((err, client, release) => {
     console.log("Database connected:", result.rows);
   });
 });
-const createEventsTable = async () => {
-  const createTableQuery = `
-    CREATE TABLE IF NOT EXISTS events (
-      id VARCHAR(40) PRIMARY KEY NOT NULL,
-      title VARCHAR NOT NULL,
-      shortdescription VARCHAR NOT NULL,
-      eventsdatetime TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-      fileid VARCHAR NOT NULL,
-      fileurl VARCHAR NOT NULL,
-      createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
-    );
-  `;
+// const createEventsTable = async () => {
+//   const createTableQuery = `
+//     CREATE TABLE IF NOT EXISTS events (
+//       id VARCHAR(40) PRIMARY KEY NOT NULL,
+//       title VARCHAR NOT NULL,
+//       shortdescription VARCHAR NOT NULL,
+//       eventsdatetime TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+//       fileid VARCHAR NOT NULL,
+//       fileurl VARCHAR NOT NULL,
+//       createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
+//     );
+//   `;
 
-  try {
-    const client = await pool.connect();
-    await client.query(createTableQuery);
-    console.log("Table 'events' created successfully");
-  } catch (err) {
-    console.error('Error creating table', err.stack);
-  } finally {
+//   try {
+//     const client = await pool.connect();
+//     await client.query(createTableQuery);
+//     console.log("Table 'events' created successfully");
+//   } catch (err) {
+//     console.error('Error creating table', err.stack);
+//   } finally {
 
-  }
-};
+//   }
+// };
 const createNewsTable = async () => {
   const createTableQuery = `
     CREATE TABLE IF NOT EXISTS news (
@@ -120,22 +120,22 @@ const createNewsTable = async () => {
   }
 };
  
-const DeleteNewsTable = async () => {
-  const query = 'DROP TABLE IF EXISTS news';
+// const DeleteNewsTable = async () => {
+//   const query = 'DROP TABLE IF EXISTS news';
 
-  try {
-    const client = await pool.connect();
-    await client.query(query);
-    console.log("Table 'news' deleted successfully");
-  } catch (err) {
-    console.error('Error creating table', err.stack);
-  } finally {
+//   try {
+//     const client = await pool.connect();
+//     await client.query(query);
+//     console.log("Table 'news' deleted successfully");
+//   } catch (err) {
+//     console.error('Error creating table', err.stack);
+//   } finally {
 
-  }
-};
-DeleteNewsTable();
-createEventsTable();
-// createNewsTable();
+//   }
+// };
+// DeleteNewsTable();
+// createEventsTable();
+createNewsTable();
 
 pool.on("error", (err) => {
   console.error("Unexpected error on idle client", err);
