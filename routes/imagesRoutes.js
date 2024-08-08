@@ -1,5 +1,4 @@
 const {addImage,getAllImages,getImage,deleteImage,updateImage,getAllImagesCount } = require('../controllers/imageController')
-const { imageUpload } = require('../middleware/imageUpload')
 const router = require('express').Router()
 const authMiddleware = require('../middleware/authMiddleware.js');
 

@@ -13,13 +13,11 @@ const host = os.hostname();
 const pool = require("./db");
 const cloudinary = require("cloudinary");
 
-readdirSync("./routes").map((route) =>
-  app.use("/api", require("./routes/" + route))
-);
+readdirSync("./routes").map((route) => app.use("/api", require("./routes/" + route)));
 app.use("/public", express.static(path.join(__dirname, "public")));
 
 // app.use(cors());
-app.use(cors({ origin: "https://thepankh.info" }));
+app.use(cors({ origin: "http://localhost:3001" }));
 app.use(express.json({ limit: "50mb" }));
 
 // Import Routes
@@ -33,6 +31,8 @@ app.use("/api/v1", require("./routes/carousalRoutes"));
 app.use("/api/v1", require("./routes/volunteerRoutes"));
 app.use("/api/v1", require("./routes/testimonialRoutes"));
 app.use("/api/v1", require("./routes/newsRoutes"));
+app.use("/api/v1", require("./routes/eventsRoutes"));
+app.use("/api/v1", require("./routes/fundDetailsRoutes"));
 
 cloudinary.config({
   cloud_name: config.CLOUDINARY_NAME,
@@ -71,6 +71,71 @@ pool.connect((err, client, release) => {
     console.log("Database connected:", result.rows);
   });
 });
+const createEventsTable = async () => {
+  const createTableQuery = `
+    CREATE TABLE IF NOT EXISTS events (
+      id VARCHAR(40) PRIMARY KEY NOT NULL,
+      title VARCHAR NOT NULL,
+      shortdescription VARCHAR NOT NULL,
+      eventsdatetime TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+      fileid VARCHAR NOT NULL,
+      fileurl VARCHAR NOT NULL,
+      createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    );
+  `;
+
+  try {
+    const client = await pool.connect();
+    await client.query(createTableQuery);
+    console.log("Table 'events' created successfully");
+  } catch (err) {
+    console.error('Error creating table', err.stack);
+  } finally {
+
+  }
+};
+const createNewsTable = async () => {
+  const createTableQuery = `
+    CREATE TABLE IF NOT EXISTS news (
+      id VARCHAR(40) PRIMARY KEY NOT NULL,
+      title VARCHAR NOT NULL,
+      shortdescription VARCHAR NOT NULL,
+      newsdatetime TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+      longdescription VARCHAR NOT NULL,
+      userid VARCHAR NOT NULL,
+      fileid VARCHAR NOT NULL,
+      fileurl VARCHAR NOT NULL,
+      createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    );
+  `;
+
+  try {
+    const client = await pool.connect();
+    await client.query(createTableQuery);
+    console.log("Table 'news' created successfully");
+  } catch (err) {
+    console.error('Error creating table', err.stack);
+  } finally {
+
+  }
+};
+ 
+const DeleteNewsTable = async () => {
+  const query = 'DROP TABLE IF EXISTS news';
+
+  try {
+    const client = await pool.connect();
+    await client.query(query);
+    console.log("Table 'news' deleted successfully");
+  } catch (err) {
+    console.error('Error creating table', err.stack);
+  } finally {
+
+  }
+};
+DeleteNewsTable();
+createEventsTable();
+// createNewsTable();
 
 pool.on("error", (err) => {
   console.error("Unexpected error on idle client", err);
@@ -79,197 +144,7 @@ pool.on("error", (err) => {
 const server = app.listen(PORT, (req, res) => {
   console.log(`Server is working on ${host}:${PORT}`);
 });
-// const createBannerTable = async () => {
-//   const createTableQuery = `
-//     CREATE TABLE IF NOT EXISTS banner (
-//       id VARCHAR(40) PRIMARY KEY NOT NULL,
-//       pagename VARCHAR NOT NULL,
-//       fileid VARCHAR NOT NULL,
-//       fileurl VARCHAR NOT NULL,
-//       createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
-//     );
-//   `;
 
-//   try {
-//     const client = await pool.connect();
-//     await client.query(createTableQuery);
-//     console.log("Table 'banner' created successfully");
-//   } catch (err) {
-//     console.error('Error creating table', err.stack);
-//   } finally {
-//     pool.end();
-//   }
-// };
-// const createCarousalTable = async () => {
-//   const createTableQuery = `
-//     CREATE TABLE IF NOT EXISTS carousal (
-//       id VARCHAR(40) PRIMARY KEY NOT NULL,
-//       title VARCHAR NOT NULL,
-//       description VARCHAR NOT NULL,
-//       fileid VARCHAR NOT NULL,
-//       fileurl VARCHAR NOT NULL,
-//       createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
-//     );
-//   `;
-
-//   try {
-//     const client = await pool.connect();
-//     await client.query(createTableQuery);
-//     console.log("Table 'carousal' created successfully");
-//   } catch (err) {
-//     console.error('Error creating table', err.stack);
-//   } finally {
-//     pool.end();
-//   }
-// };
-// const createContactUsTable = async () => {
-//   const createTableQuery = `
-//     CREATE TABLE IF NOT EXISTS contactus (
-//       id VARCHAR(40) PRIMARY KEY NOT NULL,
-//       name VARCHAR NOT NULL,
-//       email VARCHAR NOT NULL,
-//       phone VARCHAR NOT NULL,
-//       subject VARCHAR NOT NULL,
-//       message VARCHAR NOT NULL,
-//       createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
-//     );
-//   `;
-
-//   try {
-//     const client = await pool.connect();
-//     await client.query(createTableQuery);
-//     console.log("Table 'contactus' created successfully");
-//   } catch (err) {
-//     console.error('Error creating table', err.stack);
-//   } finally {
-//     pool.end();
-//   }
-// };
-// const createImageTable = async () => {
-//   const createTableQuery = `
-//     CREATE TABLE IF NOT EXISTS images (
-//       id VARCHAR(40) PRIMARY KEY NOT NULL,
-//       title VARCHAR NOT NULL,
-//       description VARCHAR NOT NULL,
-//       fileid VARCHAR NOT NULL,
-//       fileurl VARCHAR NOT NULL,
-//       createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
-//     );
-//   `;
-
-//   try {
-//     const client = await pool.connect();
-//     await client.query(createTableQuery);
-//     console.log("Table 'images' created successfully");
-//   } catch (err) {
-//     console.error('Error creating table', err.stack);
-//   } finally {
-//     // pool.end();
-//   }
-// };
-// const createKeyContactUsTable = async () => {
-//   const createTableQuery = `
-//     CREATE TABLE IF NOT EXISTS keycontact (
-//       id VARCHAR(40) PRIMARY KEY NOT NULL,
-//       name VARCHAR NOT NULL,
-//       email VARCHAR NOT NULL,
-//       phone VARCHAR NOT NULL,
-//       organization VARCHAR NOT NULL,
-//       designation VARCHAR NOT NULL,
-//       createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
-//     );
-//   `;
-
-//   try {
-//     const client = await pool.connect();
-//     await client.query(createTableQuery);
-//     console.log("Table 'keycontact' created successfully");
-//   } catch (err) {
-//     console.error('Error creating table', err.stack);
-//   } finally {
-//     pool.end();
-//   }
-// };
-// const createTestimonialTable = async () => {
-//   const createTableQuery = `
-//     CREATE TABLE IF NOT EXISTS testimonial (
-//       id VARCHAR(40) PRIMARY KEY NOT NULL,
-//       name VARCHAR NOT NULL,
-//       role VARCHAR NOT NULL,
-//       comment VARCHAR NOT NULL,
-//       fileid VARCHAR NOT NULL,
-//       fileurl VARCHAR NOT NULL,
-//       createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
-//     );
-//   `;
-
-//   try {
-//     const client = await pool.connect();
-//     await client.query(createTableQuery);
-//     console.log("Table 'testimonial' created successfully");
-//   } catch (err) {
-//     console.error('Error creating table', err.stack);
-//   } finally {
-//     // pool.end();
-//   }
-// };
-// const createVideosTable = async () => {
-//   const createTableQuery = `
-//     CREATE TABLE IF NOT EXISTS videos (
-//       id VARCHAR(40) PRIMARY KEY NOT NULL,
-//       title VARCHAR NOT NULL,
-//       description VARCHAR NOT NULL,
-//       filename VARCHAR NOT NULL,
-//       videopath VARCHAR NOT NULL,
-//       createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
-//     );
-//   `;
-
-//   try {
-//     const client = await pool.connect();
-//     await client.query(createTableQuery);
-//     console.log("Table 'videos' created successfully");
-//   } catch (err) {
-//     console.error('Error creating table', err.stack);
-//   } finally {
-//     pool.end();
-//   }
-// };
-// const createVolunteerTable = async () => {
-//   const createTableQuery = `
-//     CREATE TABLE IF NOT EXISTS volunteer (
-//       id VARCHAR(40) PRIMARY KEY NOT NULL,
-//       username VARCHAR NOT NULL,
-//       phonenumber VARCHAR NOT NULL,
-//       role VARCHAR NOT NULL,
-//       facebookurl VARCHAR NOT NULL,
-//       twitterurl VARCHAR NOT NULL,
-//       instagramurl VARCHAR NOT NULL,
-//       linkedinurl VARCHAR NOT NULL,
-//       fileid VARCHAR NOT NULL,
-//       fileurl VARCHAR NOT NULL,
-//       createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
-//     );
-//   `;
-
-//   try {
-//     const client = await pool.connect();
-//     await client.query(createTableQuery);
-//     console.log("Table 'volunteer' created successfully");
-//   } catch (err) {
-//     console.error('Error creating table', err.stack);
-//   } finally {
-//     pool.end();
-//   }
-// };
-// createBannerTable(); // Banner Done
-// createCarousalTable(); // Carousal Done
-// createContactUsTable(); // Contact Us Done
-// createImageTable();
-// createKeyContactUsTable(); // Key Contact Done
-// createTestimonialTable();
-// createVideosTable(); // Videos Done
-// createVolunteerTable();
 // // unhandled promise rejection
 process.on("unhandledRejection", (err) => {
   console.log(`Error : ${err.message}`);

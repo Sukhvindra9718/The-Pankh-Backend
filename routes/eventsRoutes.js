@@ -1,40 +1,37 @@
-const { createNews, getAllNews, deleteNews, updateNews, getAllNewsCount } = require("../controllers/newsController.js");
+const { createEvents, getAllEvents, deleteEvents, updateEvents } = require("../controllers/eventsController.js");
 const router = require("express").Router();
 const authMiddleware = require("../middleware/authMiddleware.js");
 
 // Super admin middleware
 
 router.post(
-  "/news/upload",
+  "/events/upload",
   authMiddleware.authenticationMiddleware,
   authMiddleware.superAdminMiddleware,
-  createNews
+  createEvents
 );
 
 // Admin middleware
 router.post(
-  "/news/upload",
+  "/events/upload",
   authMiddleware.authenticationMiddleware,
   authMiddleware.adminMiddleware,
-  createNews
+  createEvents
 );
 
-router.get("/news", getAllNews);
-
+router.get("/events", getAllEvents);
 router.delete(
-  "/news/:id",
+  "/events/:id",
   authMiddleware.authenticationMiddleware,
   authMiddleware.superAdminMiddleware,
-  deleteNews
+  deleteEvents
 );
 
 router.put(
-  "/news/:id",
+  "/events/:id",
   authMiddleware.authenticationMiddleware,
   authMiddleware.superAdminMiddleware,
-  updateNews
+  updateEvents
 );
 
-router.get("/countNews/count", authMiddleware.authenticationMiddleware,
-  authMiddleware.superAdminMiddleware, getAllNewsCount);
 module.exports = router;
