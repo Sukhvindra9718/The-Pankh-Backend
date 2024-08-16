@@ -89,7 +89,7 @@ const createDonationTable = async () => {
       amount BIGINT NOT NULL,
       utrnumber VARCHAR NOT NULL,
       donationdatetime TIMESTAMP WITHOUT TIME ZONE,
-      remarks VARCHAR,
+      remarks VARCHAR
     );
   `;
 
@@ -103,6 +103,7 @@ const createDonationTable = async () => {
 
   }
 };
+
 const createBankDetailsTable = async () => {
   const createTableQuery = `
     CREATE TABLE IF NOT EXISTS bankdetails (
@@ -113,7 +114,7 @@ const createBankDetailsTable = async () => {
       ifsccode VARCHAR NOT NULL,
       accountnumber VARCHAR NOT NULL,
       upiid VARCHAR NOT NULL,
-      branchname VARCHAR NOT NULL,
+      branchname VARCHAR NOT NULL
     );
   `;
 
@@ -138,7 +139,7 @@ const createFundTable = async () => {
       title VARCHAR NOT NULL,
       raisedprice VARCHAR NOT NULL,
       goalprice VARCHAR NOT NULL,
-      description VARCHAR NOT NULL,
+      description VARCHAR NOT NULL
     );
   `;
 
@@ -152,50 +153,109 @@ const createFundTable = async () => {
 
   }
 };
-createDonationTable();
-// createBankDetailsTable();
-// createFundTable();
-// Delete video table
-const deleteTable = async (table) => {
-  const deleteTableQuery = `
-    DROP TABLE IF EXISTS ${table};
+
+const createVideoTable = async () => {
+  const createTableQuery = `
+    CREATE TABLE IF NOT EXISTS videos (
+      id VARCHAR(40) PRIMARY KEY NOT NULL,
+      title VARCHAR NOT NULL,
+      description VARCHAR NOT NULL,
+      url VARCHAR NOT NULL,
+      fileid VARCHAR NOT NULL,
+      fileurl VARCHAR NOT NULL,
+      createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    );
   `;
+
   try {
     const client = await pool.connect();
-    await client.query(deleteTableQuery);
-    console.log("Table 'video' deleted successfully");
+    await client.query(createTableQuery);
+    console.log("Table 'videos' created successfully");
   } catch (err) {
-    console.error('Error deleting table', err.stack);
+    console.error('Error creating table', err.stack);
   } finally {
 
   }
 };
-deleteTable("news");
-deleteTable("events");
-// const createVideoTable = async () => {
-//   const createTableQuery = `
-//     CREATE TABLE IF NOT EXISTS videos (
-//       id VARCHAR(40) PRIMARY KEY NOT NULL,
-//       title VARCHAR NOT NULL,
-//       description VARCHAR NOT NULL,
-//       url VARCHAR NOT NULL,
-//       fileid VARCHAR NOT NULL,
-//       fileurl VARCHAR NOT NULL,
-//       createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
-//     );
-//   `;
 
+const createEventsTable = async () => {
+  const createTableQuery = `
+    CREATE TABLE IF NOT EXISTS events (
+      id VARCHAR(40) PRIMARY KEY NOT NULL,
+      title VARCHAR NOT NULL,
+      shortdescription VARCHAR NOT NULL,
+      eventsdatetime TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+      fileid VARCHAR NOT NULL,
+      fileurl VARCHAR NOT NULL,
+      createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+      link VARCHAR NOT NULL
+    );
+  `;
+
+  try {
+    const client = await pool.connect();
+    await client.query(createTableQuery);
+    console.log("Table 'events' created successfully");
+  } catch (err) {
+    console.error('Error creating table', err.stack);
+  } finally {
+
+  }
+};
+ 
+const createNewsTable = async () => {
+  const createTableQuery = `
+    CREATE TABLE IF NOT EXISTS news (
+      id VARCHAR(40) PRIMARY KEY NOT NULL,
+      title VARCHAR NOT NULL,
+      shortdescription VARCHAR NOT NULL,
+      newsdatetime TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+      longdescription VARCHAR NOT NULL,
+      userid VARCHAR NOT NULL,
+      fileid VARCHAR NOT NULL,
+      fileurl VARCHAR NOT NULL,
+      createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+      link VARCHAR NOT NULL
+    );
+  `;
+
+  try {
+    const client = await pool.connect();
+    await client.query(createTableQuery);
+    console.log("Table 'news' created successfully");
+  } catch (err) {
+    console.error('Error creating table', err.stack);
+  } finally {
+
+  }
+};
+
+createDonationTable();
+createBankDetailsTable();
+createFundTable();
+createVideoTable();
+createEventsTable();
+createNewsTable();
+
+
+
+// Delete table
+// const deleteTable = async (table) => {
+//   const deleteTableQuery = `
+//     DROP TABLE IF EXISTS ${table};
+//   `;
 //   try {
 //     const client = await pool.connect();
-//     await client.query(createTableQuery);
-//     console.log("Table 'videos' created successfully");
+//     await client.query(deleteTableQuery);
+//     console.log("Table 'video' deleted successfully");
 //   } catch (err) {
-//     console.error('Error creating table', err.stack);
+//     console.error('Error deleting table', err.stack);
 //   } finally {
 
 //   }
 // };
-// createVideoTable();
+
+
 pool.on("error", (err) => {
   console.error("Unexpected error on idle client", err);
   process.exit(-1);
