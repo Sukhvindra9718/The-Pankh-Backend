@@ -233,29 +233,29 @@ const createNewsTable = async () => {
 // createDonationTable();
 // createBankDetailsTable();
 // createFundTable();
-// createVideoTable();
+createVideoTable();
 // createEventsTable();
 // createNewsTable();
 
 
 
 // Delete table
-const deleteTable = async (table) => {
-  const deleteTableQuery = `
-    DROP TABLE IF EXISTS ${table};
-  `;
-  try {
-    const client = await pool.connect();
-    await client.query(deleteTableQuery);
-    console.log(`Table ${table} deleted successfully`);
-  } catch (err) {
-    console.error('Error deleting table', err.stack);
-  } finally {
+// const deleteTable = async (table) => {
+//   const deleteTableQuery = `
+//     DROP TABLE IF EXISTS ${table};
+//   `;
+//   try {
+//     const client = await pool.connect();
+//     await client.query(deleteTableQuery);
+//     console.log(`Table ${table} deleted successfully`);
+//   } catch (err) {
+//     console.error('Error deleting table', err.stack);
+//   } finally {
 
-  }
-};
+//   }
+// };
 
-deleteTable("videos")
+
 pool.on("error", (err) => {
   console.error("Unexpected error on idle client", err);
   process.exit(-1);
