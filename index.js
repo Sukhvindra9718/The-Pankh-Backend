@@ -13,17 +13,11 @@ const host = os.hostname();
 const pool = require("./db");
 const cloudinary = require("cloudinary");
 
-readdirSync("./routes").map((route) =>
-  app.use("/api", require("./routes/" + route))
-);
+readdirSync("./routes").map((route) => app.use("/api", require("./routes/" + route)));
 app.use("/public", express.static(path.join(__dirname, "public")));
 
 // app.use(cors());
-if (config.NODE_ENV === "production") {
-  app.use(cors({ origin: "https://thepankh.info" }));
-} else {
-  app.use(cors({ origin: "http://localhost:3001" }));
-}
+app.use(cors({ origin: "https://thepankh.info" }));
 app.use(express.json({ limit: "50mb" }));
 
 // Import Routes
@@ -39,6 +33,9 @@ app.use("/api/v1", require("./routes/testimonialRoutes"));
 app.use("/api/v1", require("./routes/newsRoutes"));
 app.use("/api/v1", require("./routes/eventsRoutes"));
 app.use("/api/v1", require("./routes/fundDetailsRoutes"));
+app.use("/api/v1", require("./routes/projectRoutes"));
+app.use("/api/v1", require("./routes/donationRoutes.js"));
+app.use("/api/v1", require("./routes/bankdetailsRoutes.js"));
 
 cloudinary.config({
   cloud_name: config.CLOUDINARY_NAME,
@@ -77,38 +74,108 @@ pool.connect((err, client, release) => {
     console.log("Database connected:", result.rows);
   });
 });
-// const createEventsTable = async () => {
-//   const createTableQuery = `
-//     CREATE TABLE IF NOT EXISTS events (
-//       id VARCHAR(40) PRIMARY KEY NOT NULL,
-//       title VARCHAR NOT NULL,
-//       shortdescription VARCHAR NOT NULL,
-//       eventsdatetime TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-//       fileid VARCHAR NOT NULL,
-//       fileurl VARCHAR NOT NULL,
-//       createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
-//     );
-//   `;
-
-//   try {
-//     const client = await pool.connect();
-//     await client.query(createTableQuery);
-//     console.log("Table 'events' created successfully");
-//   } catch (err) {
-//     console.error('Error creating table', err.stack);
-//   } finally {
-
-//   }
-// };
-const createNewsTable = async () => {
+const createDonationTable = async () => {
   const createTableQuery = `
-    CREATE TABLE IF NOT EXISTS news (
+    CREATE TABLE IF NOT EXISTS donations (
+      id VARCHAR(40) PRIMARY KEY NOT NULL,
+      fileid VARCHAR NOT NULL,
+      fileurl VARCHAR NOT NULL,
+      createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+      fullname VARCHAR NOT NULL,
+      email VARCHAR,
+      phonenumber VARCHAR NOT NULL,
+      country VARCHAR,
+      amount BIGINT NOT NULL,
+      utrnumber VARCHAR NOT NULL,
+      donationdatetime VARCHAR NOT NULL,
+      remarks VARCHAR,
+    );
+  `;
+
+  try {
+    const client = await pool.connect();
+    await client.query(createTableQuery);
+    console.log("Table 'donations' created successfully");
+  } catch (err) {
+    console.error('Error creating table', err.stack);
+  } finally {
+
+  }
+};
+const createBankDetailsTable = async () => {
+  const createTableQuery = `
+    CREATE TABLE IF NOT EXISTS bankdetails (
+      id VARCHAR(40) PRIMARY KEY NOT NULL,
+      fileid VARCHAR NOT NULL,
+      fileurl VARCHAR NOT NULL,
+      createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+      ifsccode VARCHAR NOT NULL,
+      accountnumber VARCHAR NOT NULL,
+      upiid VARCHAR NOT NULL,
+      branchname VARCHAR NOT NULL,
+    );
+  `;
+
+  try {
+    const client = await pool.connect();
+    await client.query(createTableQuery);
+    console.log("Table 'bankdetails' created successfully");
+  } catch (err) {
+    console.error('Error creating table', err.stack);
+  } finally {
+
+  }
+};
+const createFundTable = async () => {
+  const createTableQuery = `
+    CREATE TABLE IF NOT EXISTS fund (
+      id VARCHAR(40) PRIMARY KEY NOT NULL,
+      fileid VARCHAR NOT NULL,
+      fileurl VARCHAR NOT NULL,
+      createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+      title VARCHAR NOT NULL,
+      raisedprice VARCHAR NOT NULL,
+      goalprice VARCHAR NOT NULL,
+      description VARCHAR NOT NULL,
+    );
+  `;
+
+  try {
+    const client = await pool.connect();
+    await client.query(createTableQuery);
+    console.log("Table 'fund' created successfully");
+  } catch (err) {
+    console.error('Error creating table', err.stack);
+  } finally {
+
+  }
+};
+createDonationTable();
+createBankDetailsTable();
+createFundTable();
+// Delete video table
+const deleteTable = async () => {
+  const deleteTableQuery = `
+    DROP TABLE IF EXISTS video;
+  `;
+  try {
+    const client = await pool.connect();
+    await client.query(deleteTableQuery);
+    console.log("Table 'video' deleted successfully");
+  } catch (err) {
+    console.error('Error deleting table', err.stack);
+  } finally {
+
+  }
+};
+deleteTable();
+const createVideoTable = async () => {
+  const createTableQuery = `
+    CREATE TABLE IF NOT EXISTS videos (
       id VARCHAR(40) PRIMARY KEY NOT NULL,
       title VARCHAR NOT NULL,
-      shortdescription VARCHAR NOT NULL,
-      newsdatetime TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-      longdescription VARCHAR NOT NULL,
-      userid VARCHAR NOT NULL,
+      description VARCHAR NOT NULL,
+      url VARCHAR NOT NULL,
       fileid VARCHAR NOT NULL,
       fileurl VARCHAR NOT NULL,
       createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
@@ -118,30 +185,14 @@ const createNewsTable = async () => {
   try {
     const client = await pool.connect();
     await client.query(createTableQuery);
-    console.log("Table 'news' created successfully");
+    console.log("Table 'videos' created successfully");
   } catch (err) {
-    console.error("Error creating table", err.stack);
+    console.error('Error creating table', err.stack);
   } finally {
+
   }
 };
-
-// const DeleteNewsTable = async () => {
-//   const query = 'DROP TABLE IF EXISTS news';
-
-//   try {
-//     const client = await pool.connect();
-//     await client.query(query);
-//     console.log("Table 'news' deleted successfully");
-//   } catch (err) {
-//     console.error('Error creating table', err.stack);
-//   } finally {
-
-//   }
-// };
-// DeleteNewsTable();
-// createEventsTable();
-createNewsTable();
-
+createVideoTable();
 pool.on("error", (err) => {
   console.error("Unexpected error on idle client", err);
   process.exit(-1);

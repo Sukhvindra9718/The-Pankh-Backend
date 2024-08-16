@@ -158,7 +158,7 @@ exports.getAllCarousalCount = async (req, res) => {
     res.status(200).json({
       success: true,
       tableName:"Carousal",
-      count: carousal.rows.length,
+      count: carousal.rows[0].count,
     });
   } catch (error) {
     res.status(400).json({

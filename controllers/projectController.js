@@ -2,19 +2,20 @@ const pool = require("../db");
 const fs = require("fs");
 const uuid = require("uuid");
 const cloudinary = require("cloudinary");
+const { error } = require("console");
 
-// Images CRUD
-exports.addImage = async (req, res) => {
+// Projects CRUD
+exports.addProject = async (req, res) => {
   try {
     const { title, description, file } = req.body;
     const id = uuid.v4();
 
     const myCloud = await cloudinary.v2.uploader.upload(file, {
-      folder: "thepankh/galleryimages",
+      folder: "thepankh/projects",
       Crop: "fill",
     });
     await pool.query(
-      "INSERT INTO images (id,title,description,fileid,fileurl,createdat) VALUES ($1, $2, $3,$4,$5,$6) RETURNING *",
+      "INSERT INTO projects (id,title,description,fileid,fileurl,createdat) VALUES ($1, $2, $3,$4,$5,$6) RETURNING *",
       [
         id,
         title,
@@ -27,7 +28,7 @@ exports.addImage = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "Image Uploaded Succesfully",
+      message: "Project Uploaded Succesfully",
     });
   } catch (error) {
     console.log(error)
@@ -41,118 +42,118 @@ exports.addImage = async (req, res) => {
   }
 };
 
-exports.getAllImages = async (req, res) => {
+exports.getAllProjects = async (req, res) => {
   try {
-    console.log("get all images");
-    const images = await pool.query("SELECT * FROM images");
+    const projects = await pool.query("SELECT * FROM projects");
     res.status(200).json({
       success: true,
-      images: images.rows,
+      projects: projects.rows,
     });
+    console.log(projects.rows)
   } catch (error) {
-    console.log(error);
-    res.status(400).json({
+    console.log(error)
+    res.status(200).json({
       success: false,
       error: error.message,
-      userError: "Images fetch failed",
+      userError: "Projects fetch failed",
     });
   }
 };
 
-exports.getImage = async (req, res) => {
+exports.getProject = async (req, res) => {
   try {
     const { id } = req.params;
-    const image = await pool.query("SELECT * FROM images WHERE id = $1", [id]);
-    if (image.rows.length === 0) {
-      return res.status(404).json({ success: false, msg: "Image not found" });
+    const projects = await pool.query("SELECT * FROM projects WHERE id = $1", [id]);
+    if (projects.rows.length === 0) {
+      return res.status(404).json({ success: false, msg: "Project not found" });
     }
     res.status(200).json({
       success: true,
-      image: image.rows[0],
+      projects: projects.rows[0],
     });
   } catch (error) {
     res.status(400).json({
       success: false,
       error: error.message,
-      userError: "Image fetch failed",
+      userError: "Project fetch failed",
     });
   }
 };
 
-exports.deleteImage = async (req, res) => {
+exports.deleteProject = async (req, res) => {
   try {
     const { id } = req.params;
-    const image = await pool.query("SELECT * FROM images WHERE id = $1", [id]);
-    if (image) {
-      const fileid = image.rows[0].fileid;
+    const projects = await pool.query("SELECT * FROM projects WHERE id = $1", [id]);
+    if (projects) {
+      const fileid = projects.rows[0].fileid;
       await cloudinary.v2.uploader.destroy(fileid);
-      await pool.query("DELETE FROM images WHERE id = $1", [id]);
+      await pool.query("DELETE FROM projects WHERE id = $1", [id]);
     }
 
     res.status(200).json({
       success: true,
-      message: "Image Deleted Succesfully",
+      message: "Project Deleted Succesfully",
     });
   } catch (error) {
     res.status(400).json({
       success: false,
       error: error.message,
-      userError: "Image delete failed",
+      userError: "Project delete failed",
     });
   }
 };
 
-exports.updateImage = async (req, res) => {
+exports.updateProject = async (req, res) => {
   try {
     const { id } = req.params;
     const { title, description, file } = req.body;
-    const image = await pool.query("SELECT * FROM images WHERE id = $1", [id]);
-    if (image.rows.length === 0) {
-      return res.status(404).json({ success: false, msg: "Image not found" });
+    const projects = await pool.query("SELECT * FROM projects WHERE id = $1", [id]);
+    if (projects.rows.length === 0) {
+      return res.status(404).json({ success: false, msg: "Project not found" });
     }
     if (file) {
-      const fileid = image.rows[0].fileid;
+      const fileid = projects.rows[0].fileid;
       await cloudinary.v2.uploader.destroy(fileid);
       const myCloud = await cloudinary.v2.uploader.upload(file, {
-        folder: "thepankh/galleryimages",
+        folder: "thepankh/projects",
         Crop: "fill",
       });
       await pool.query(
-        "UPDATE images SET fileid = $1, fileurl = $2,title = $3,description=$4 WHERE id = $5",
+        "UPDATE projects SET fileid = $1, fileurl = $2,title = $3,description=$4 WHERE id = $5",
         [myCloud.public_id, myCloud.secure_url, title, description, id]
       );
     } else {
       await pool.query(
-        "UPDATE images SET title = $1,description=$2 WHERE id = $3",
+        "UPDATE projects SET title = $1,description=$2 WHERE id = $3",
         [title, description, id]
       );
     }
     res.status(200).json({
       success: true,
-      message: "Image Updated Succesfully",
+      message: "Project Updated Succesfully",
     });
   } catch (error) {
     res.status(400).json({
       success: false,
       error: error.message,
-      userError: "Image update failed",
+      userError: "Project update failed",
     });
   }
 };
 
-exports.getAllImagesCount = async (req, res) => {
+exports.getAllProjectsCount = async (req, res) => {
   try {
-    const images = await pool.query("SELECT count(*) FROM images");
+    const projects = await pool.query("SELECT count(*) FROM projects");
     res.status(200).json({
       success: true,
-      tableName:"Images",
-      count: images.rows[0].count,
+      tableName:"Projects",
+      count: projects.rows[0].count,
     });
   } catch (error) {
     res.status(400).json({
       success: false,
       error: error.message,
-      userError: "Images fetch failed",
+      userError: "Projects fetch failed",
     });
   }
 };

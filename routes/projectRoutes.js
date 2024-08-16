@@ -1,38 +1,40 @@
-const { createEvents, getAllEvents, deleteEvents, updateEvents, getAllEventsCount } = require("../controllers/eventsController.js");
+const {addProject,getAllProjects,getAllProjectsCount,updateProject,deleteProject  } = require("../controllers/projectController.js");
 const router = require("express").Router();
 const authMiddleware = require("../middleware/authMiddleware.js");
 
 // Super admin middleware
 
 router.post(
-  "/events/upload",
+  "/project/upload",
   authMiddleware.authenticationMiddleware,
   authMiddleware.superAdminMiddleware,
-  createEvents
+  addProject
 );
 
 // Admin middleware
 router.post(
-  "/events/upload",
+  "/project/upload",
   authMiddleware.authenticationMiddleware,
   authMiddleware.adminMiddleware,
-  createEvents
+  addProject
 );
 
-router.get("/events", getAllEvents);
-router.get("/events/count", getAllEventsCount);
+router.get("/projects", getAllProjects);
+
 router.delete(
-  "/events/:id",
+  "/project/:id",
   authMiddleware.authenticationMiddleware,
   authMiddleware.superAdminMiddleware,
-  deleteEvents
+  deleteProject
 );
 
 router.put(
-  "/events/:id",
+  "/project/:id",
   authMiddleware.authenticationMiddleware,
   authMiddleware.superAdminMiddleware,
-  updateEvents
+  updateProject
 );
 
+router.get("/countProjects/count", authMiddleware.authenticationMiddleware,
+  authMiddleware.superAdminMiddleware, getAllProjectsCount);
 module.exports = router;

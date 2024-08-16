@@ -118,3 +118,20 @@ exports.updateEvents = async (req, res) => {
     });
   }
 };
+
+exports.getAllEventsCount = async (req, res) => {
+  try {
+    const events = await pool.query("SELECT count(*) FROM events");
+    res.status(200).json({
+      success: true,
+      tableName : "Events",
+      count: events.rows[0].count,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      error: error.message,
+      userError: "Events fetch failed",
+    });
+  }
+};

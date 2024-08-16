@@ -182,7 +182,7 @@ exports.getAllVolunteerCount = async (req, res) => {
     res.status(200).json({
       success: true,
       tableName: "volunteer",
-      count: volunteer.rows.length,
+      count: volunteer.rows[0].count,
     });
   } catch (error) {
     res.status(400).json({

@@ -55,7 +55,7 @@ const getAllContactUsCount = async (req, res) => {
       res.status(200).json({
         success: true,
         tableName : "Contact Us",
-        count: contactus.rows.length,
+        count: contactus.rows[0].count,
       });
     } catch (error) {
       res.status(400).json({
@@ -131,7 +131,7 @@ const getAllkeyContactCount = async (req, res) => {
       res.status(200).json({
         success: true,
         tableName : "Key Contacts",
-        count: keycontact.rows.length,
+        count: keycontact.rows[0].count,
       });
     } catch (error) {
       res.status(400).json({

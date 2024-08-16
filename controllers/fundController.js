@@ -6,7 +6,8 @@ const cloudinary = require("cloudinary");
 // Images CRUD
 exports.addfundDetails = async (req, res) => {
   try {
-    const { title,description,raisedPrice,goalPrice, file } = req.body;
+    const { title,description,raisedprice,goalprice, file } = req.body;
+    console.log(title,description,raisedprice,goalprice,)
     const created_at = new Date();
     const id = uuid.v4();
     const myCloud = await cloudinary.v2.uploader.upload(file, {
@@ -14,12 +15,12 @@ exports.addfundDetails = async (req, res) => {
       Crop: "fill",
     });
     await pool.query(
-      "INSERT INTO fund (id,title,raisedPrice,goalPrice,description,createdat,fileUrl,fileId) VALUES ($1, $2, $3,$4,$5, $6, $7, $8) RETURNING *",
+      "INSERT INTO fund (id,title, raisedprice, goalprice, description, createdat, fileurl, fileId) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *",
       [
         id,
         title,
-        raisedPrice,
-        goalPrice,
+        raisedprice,
+        goalprice,
         description,
         created_at,
         myCloud.secure_url,
@@ -105,7 +106,7 @@ exports.deleteFundDetails = async (req, res) => {
 exports.updateFundDetails = async (req, res) => {
   try {
     const { id } = req.params;
-    const { title,description,raisedPrice,goalPrice, file } = req.body;
+    const { title,description,raisedprice,goalprice, file } = req.body;
     const fund = await pool.query("SELECT * FROM fund WHERE id = $1", [id]);
     if (fund.rows.length === 0) {
       return res.status(404).json({ success: false, msg: "Fund Details not found" });
@@ -118,15 +119,15 @@ exports.updateFundDetails = async (req, res) => {
         Crop: "fill",
       });
       await pool.query(
-        "UPDATE fund SET fileId = $1, fileUrl = $2,title = $3, description = $4, raisedPrice = $5, goalPrice = $6 WHERE id = $7",
-        [myCloud.public_id, myCloud.secure_url, title, description, raisedPrice, goalPrice, id]
+        "UPDATE fund SET fileId = $1, fileUrl = $2,title = $3, description = $4, raisedprice = $5, goalprice = $6 WHERE id = $7",
+        [myCloud.public_id, myCloud.secure_url, title, description, raisedprice, goalprice, id]
       );
     } else {
-      await pool.query("UPDATE fund SET title = $1, description = $2, raisedPrice = $3, goalPrice = $4 WHERE id = $5", [
+      await pool.query("UPDATE fund SET title = $1, description = $2, raisedprice = $3, goalprice = $4 WHERE id = $5", [
         title,
         description,
-        raisedPrice,
-        goalPrice,
+        raisedprice,
+        goalprice,
         id,
       ]);
     }
@@ -149,7 +150,7 @@ exports.getAllFundDetailsCount = async (req, res) => {
     res.status(200).json({
       success: true,
       tableName: "fund",
-      count: fund.rows.length,
+      count: fund.rows[0].count,
     });
   } catch (error) {
     res.status(400).json({

@@ -1,38 +1,40 @@
-const { createEvents, getAllEvents, deleteEvents, updateEvents, getAllEventsCount } = require("../controllers/eventsController.js");
+const { createBankDetails, getAllBankDetails, deleteBankDetails, updateBankDetails, getAllBankDetailsCount } = require("../controllers/BankDetailsController.js");
 const router = require("express").Router();
 const authMiddleware = require("../middleware/authMiddleware.js");
 
 // Super admin middleware
 
 router.post(
-  "/events/upload",
+  "/BankDetails/upload",
   authMiddleware.authenticationMiddleware,
   authMiddleware.superAdminMiddleware,
-  createEvents
+  createBankDetails
 );
 
-// Admin middleware
+// // Admin middleware
 router.post(
-  "/events/upload",
+  "/BankDetails/upload",
   authMiddleware.authenticationMiddleware,
   authMiddleware.adminMiddleware,
-  createEvents
+  createBankDetails
 );
 
-router.get("/events", getAllEvents);
-router.get("/events/count", getAllEventsCount);
+router.get("/BankDetails", getAllBankDetails);
+// router.get("/BankDetails/count", getAllBankDetailsCount);
+
 router.delete(
-  "/events/:id",
+  "/BankDetails/:id",
   authMiddleware.authenticationMiddleware,
   authMiddleware.superAdminMiddleware,
-  deleteEvents
+  deleteBankDetails
 );
+
 
 router.put(
-  "/events/:id",
+  "/BankDetails/:id",
   authMiddleware.authenticationMiddleware,
   authMiddleware.superAdminMiddleware,
-  updateEvents
+  updateBankDetails
 );
 
 module.exports = router;
