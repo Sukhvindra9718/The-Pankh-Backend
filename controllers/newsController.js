@@ -6,7 +6,7 @@ const cloudinary = require("cloudinary");
 // News CRUD
 exports.createNews = async (req, res) => {
   try {
-    const { title, shortdescription, newsdatetime, createdat, longdescription, file } = req.body;
+    const { title, shortdescription, newsdatetime, createdat, longdescription, file, link } = req.body;
     const userId = req.user.id;
     const created_at = new Date();
     const id = uuid.v4();
@@ -15,7 +15,7 @@ exports.createNews = async (req, res) => {
       Crop: "fill",
     });
     await pool.query(
-      "INSERT INTO news (id, title, shortdescription, longdescription, fileid, fileurl, createdat, userid, newsdatetime ) VALUES ($1, $2, $3,$4,$5, $6, $7, $8, $9) RETURNING *",
+      "INSERT INTO news (id, title, shortdescription, longdescription, fileid, fileurl, createdat, userid, newsdatetime, link ) VALUES ($1, $2, $3,$4,$5, $6, $7, $8, $9, $10) RETURNING *",
       [
         id,
         title.toLowerCase(),
@@ -26,6 +26,7 @@ exports.createNews = async (req, res) => {
         created_at,
         userId,
         newsdatetime,
+        link,
       ]
     );
 
@@ -58,6 +59,23 @@ exports.getAllNews = async (req, res) => {
   }
 };
 
+// write a function to get the recently created two news
+exports.getTopTwoNews = async (req, res) => {
+  try {
+    const news = await pool.query("SELECT * FROM news ORDER BY createdat DESC LIMIT 2");
+    res.status(200).json({
+      success: true,
+      news: news.rows,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      error: error.message,
+      userError: "News fetch failed",
+    });
+  }
+}
+
 exports.deleteNews = async (req, res) => {
   try {
     const { id } = req.params;
@@ -87,7 +105,7 @@ exports.updateNews = async (req, res) => {
   try {
     const { id } = req.params;
     const userID = req.user.id;
-    const { title, shortdescription, longdescription, file, newsdatetime } = req.body;
+    const { title, shortdescription, longdescription, file, newsdatetime, link } = req.body;
 
     const news = await pool.query("SELECT * FROM news WHERE id = $1", [id]);
 
@@ -102,13 +120,13 @@ exports.updateNews = async (req, res) => {
         Crop: "fill",
       });
       await pool.query(
-        "UPDATE news SET fileid = $1, fileurl = $2, title = $3, shortdescription = $4, newsdatetime = $5, longdescription = $7, userid = $8 WHERE id = $6, ",
-        [myCloud.public_id, myCloud.secure_url, title, shortdescription, newsdatetime, id, longdescription, userID]
+        "UPDATE news SET fileid = $1, fileurl = $2, title = $3, shortdescription = $4, newsdatetime = $5, longdescription = $7, userid = $8, link = $9 WHERE id = $6, ",
+        [myCloud.public_id, myCloud.secure_url, title, shortdescription, newsdatetime, id, longdescription, userID, link]
       );
     } else {
       await pool.query(
-        "UPDATE news SET title = $1,shortdescription = $2, newsdatetime = $3, longdescription = $5, userid = $6 WHERE id = $4",
-        [title, shortdescription, newsdatetime, id, longdescription, userID]
+        "UPDATE news SET title = $1,shortdescription = $2, newsdatetime = $3, longdescription = $5, userid = $6, link = $7 WHERE id = $4",
+        [title, shortdescription, newsdatetime, id, longdescription, userID, link]
       );
     }
     res.status(200).json({

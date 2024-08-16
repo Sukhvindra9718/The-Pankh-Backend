@@ -49,9 +49,8 @@ exports.getAllProjects = async (req, res) => {
       success: true,
       projects: projects.rows,
     });
-    console.log(projects.rows)
+
   } catch (error) {
-    console.log(error)
     res.status(200).json({
       success: false,
       error: error.message,

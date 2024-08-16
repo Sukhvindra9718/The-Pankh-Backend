@@ -15,7 +15,7 @@ exports.addfundDetails = async (req, res) => {
       Crop: "fill",
     });
     await pool.query(
-      "INSERT INTO fund (id,title, raisedprice, goalprice, description, createdat, fileurl, fileId) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *",
+      "INSERT INTO fund (id,title, raisedprice, goalprice, description, createdat, fileUrl, fileId) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *",
       [
         id,
         title,

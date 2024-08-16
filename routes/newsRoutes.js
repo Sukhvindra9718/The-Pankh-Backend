@@ -1,4 +1,4 @@
-const { createNews, getAllNews, deleteNews, updateNews, getAllNewsCount } = require("../controllers/newsController.js");
+const { createNews, getAllNews, deleteNews, updateNews, getAllNewsCount, getTopTwoNews } = require("../controllers/newsController.js");
 const router = require("express").Router();
 const authMiddleware = require("../middleware/authMiddleware.js");
 
@@ -20,6 +20,7 @@ router.post(
 );
 
 router.get("/news", getAllNews);
+router.get("/twonews", getTopTwoNews)
 
 router.delete(
   "/news/:id",
