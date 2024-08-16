@@ -74,48 +74,21 @@ pool.connect((err, client, release) => {
     console.log("Database connected:", result.rows);
   });
 });
-// const createDonationTable = async () => {
-//   const createTableQuery = `
-//     CREATE TABLE IF NOT EXISTS donations (
-//       id VARCHAR(40) PRIMARY KEY NOT NULL,
-//       fileid VARCHAR NOT NULL,
-//       fileurl VARCHAR NOT NULL,
-//       createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-//       fullname VARCHAR NOT NULL,
-//       email VARCHAR,
-//       phonenumber VARCHAR NOT NULL,
-//       country VARCHAR,
-//       amount BIGINT NOT NULL,
-//       utrnumber VARCHAR NOT NULL,
-//       donationdatetime VARCHAR NOT NULL,
-//       remarks VARCHAR,
-//     );
-//   `;
 
-//   try {
-//     const client = await pool.connect();
-//     await client.query(createTableQuery);
-//     console.log("Table 'donations' created successfully");
-//   } catch (err) {
-//     console.error('Error creating table', err.stack);
-//   } finally {
-
-//   }
-// };
 const createDonationTable = async () => {
   const createTableQuery = `
     CREATE TABLE IF NOT EXISTS donations (
       id VARCHAR(40) PRIMARY KEY NOT NULL,
       fileid VARCHAR NOT NULL,
       fileurl VARCHAR NOT NULL,
-      createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
       fullname VARCHAR NOT NULL,
       email VARCHAR NOT NULL,
       phonenumber VARCHAR NOT NULL,
       country VARCHAR NOT NULL,
       amount BIGINT NOT NULL,
       utrnumber VARCHAR NOT NULL,
-      donationdatetime VARCHAR NOT NULL,
+      donationdatetime TIMESTAMP WITHOUT TIME ZONE,
       remarks VARCHAR,
     );
   `;
@@ -183,9 +156,9 @@ createDonationTable();
 // createBankDetailsTable();
 // createFundTable();
 // Delete video table
-const deleteTable = async () => {
+const deleteTable = async (table) => {
   const deleteTableQuery = `
-    DROP TABLE IF EXISTS video;
+    DROP TABLE IF EXISTS ${table};
   `;
   try {
     const client = await pool.connect();
@@ -197,7 +170,8 @@ const deleteTable = async () => {
 
   }
 };
-deleteTable();
+deleteTable("news");
+deleteTable("events");
 // const createVideoTable = async () => {
 //   const createTableQuery = `
 //     CREATE TABLE IF NOT EXISTS videos (
