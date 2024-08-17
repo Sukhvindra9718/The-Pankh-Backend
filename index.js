@@ -55,12 +55,12 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
-// app.use(express.static(path.join(__dirname, '../frontend/dist')));
+app.use(express.static(path.join(__dirname, 'build')));
 
-// app.get('*', (req, res) => {
-//   res.sendFile(path.join(__dirname, '../frontend/dist', 'index.html'));
-// });
-
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+});
+console.log(path.join(__dirname, 'build', 'index.html'))
 // Database Connection
 pool.connect((err, client, release) => {
   if (err) {
@@ -233,7 +233,7 @@ const createNewsTable = async () => {
 // createDonationTable();
 // createBankDetailsTable();
 // createFundTable();
-createVideoTable();
+// createVideoTable();
 // createEventsTable();
 // createNewsTable();
 
