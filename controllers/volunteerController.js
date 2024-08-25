@@ -2,33 +2,7 @@ const pool = require("../db");
 const uuid = require("uuid");
 const cloudinary = require("cloudinary");
 
-const createVolunteerTable = async () => {
-  const createTableQuery = `
-    CREATE TABLE IF NOT EXISTS volunteer (
-      id VARCHAR(40) PRIMARY KEY NOT NULL,
-      username VARCHAR NOT NULL,
-      phonenumber VARCHAR NOT NULL,
-      role VARCHAR NOT NULL,
-      facebookurl VARCHAR NOT NULL,
-      twitterurl VARCHAR NOT NULL,
-      instagramurl VARCHAR NOT NULL,
-      linkedinurl VARCHAR NOT NULL,
-      fileid VARCHAR NOT NULL,
-      fileurl VARCHAR NOT NULL,
-      createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
-    );
-  `;
- 
-  try {
-    const client = await pool.connect();
-    await client.query(createTableQuery);
-    console.log("Table 'volunteer' created successfully");
-  } catch (err) {
-    console.error('Error creating table', err.stack);
-  } finally {
- 
-  }
-};
+
  
 
 exports.createVolunteer = async (req, res) => {
@@ -74,7 +48,6 @@ exports.createVolunteer = async (req, res) => {
 };
 
 exports.getAllVolunteers = async (req, res) => {
-  createVolunteerTable();
   try {
     const volunteers = await pool.query("SELECT * FROM volunteer");
     res.status(200).json({

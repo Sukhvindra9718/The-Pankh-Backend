@@ -2,30 +2,7 @@ const pool = require("../db");
 const uuid = require("uuid");
 const cloudinary = require("cloudinary");
 
-const createDonationTable = async () => {
-    const createTableQuery = `CREATE TABLE IF NOT EXISTS donations (
-        id UUID PRIMARY KEY NOT NULL,
-        fileid VARCHAR NOT NULL,
-        fileurl VARCHAR NOT NULL,
-        createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-        fullname VARCHAR NOT NULL,
-        email VARCHAR NOT NULL,
-        phonenumber VARCHAR NOT NULL,
-        country VARCHAR NOT NULL,
-        amount VARCHAR NOT NULL,
-        utrnumber VARCHAR NOT NULL,
-        donationdatetime TIMESTAMP WITHOUT TIME ZONE,
-        remarks TEXT
-    )`;
-    try {
-        const client = await pool.connect();
-        await client.query(createTableQuery);
-        console.log("Table 'donations' created successfully");
-    } catch (err) {
-        console.error("Error creating table", err.stack);
-    } finally {
-    }
-};
+
 // Donation CRUD
 exports.createDonation = async (req, res) => {
     try {
@@ -69,7 +46,6 @@ exports.createDonation = async (req, res) => {
 };
 
 exports.getAllDonation = async (req, res) => {
-    createDonationTable();
     try {
         const Donations = await pool.query("SELECT * FROM donations");
         res.status(200).json({

@@ -2,26 +2,7 @@ const pool = require("../db");
 const uuid = require("uuid");
 const cloudinary = require("cloudinary");
 
-const createProjectsTable = async () => {
-  const createTableQuery = `
-    CREATE TABLE IF NOT EXISTS projects (
-      id UUID PRIMARY KEY,
-      title VARCHAR NOT NULL,
-      description TEXT NOT NULL,
-      fileid VARCHAR NOT NULL,
-      fileurl VARCHAR NOT NULL,
-      createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
-    );
-  `;
-  try {
-    const client = await pool.connect();
-    await client.query(createTableQuery);
-    console.log("Table 'projects' created successfully");
-  } catch (err) {
-    console.error("Error creating table", err.stack);
-  } finally {
-  }
-};
+
 // Projects CRUD
 exports.addProject = async (req, res) => {
   try {
@@ -61,7 +42,6 @@ exports.addProject = async (req, res) => {
 };
 
 exports.getAllProjects = async (req, res) => {
-  createProjectsTable();
   try {
     const projects = await pool.query("SELECT * FROM projects");
     res.status(200).json({

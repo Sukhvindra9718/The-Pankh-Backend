@@ -3,27 +3,7 @@
 const pool = require("../db");
 const uuid = require("uuid");
 
-const createContactUsTable = async () => {
-  const createTableQuery = `
-    CREATE TABLE IF NOT EXISTS contactus (
-      id UUID PRIMARY KEY NOT NULL,
-      name VARCHAR NOT NULL,
-      email VARCHAR NOT NULL,
-      phone VARCHAR NOT NULL,
-      subject VARCHAR NOT NULL,
-      message TEXT NOT NULL,
-      createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
-    );
-  `;
-  try {
-    const client = await pool.connect();
-    await client.query(createTableQuery);
-    console.log("Table 'contactus' created successfully");
-  } catch (err) {
-    console.error("Error creating table", err.stack);
-  } finally {
-  }
-};
+
 // Contact Us Form
 const registerContactUs = async (req, res) => {
   try {
@@ -49,7 +29,7 @@ const registerContactUs = async (req, res) => {
 };
 
 const getAllContactUs = async (req, res) => {
-  createContactUsTable();
+
   try {
     console.log("get all contact us");
     const allContactUs = await pool.query("SELECT * FROM contactus");
@@ -112,26 +92,7 @@ const getAllContactUsCount = async (req, res) => {
   }
 };
 
-const createKeyContactTable = async () => {
-  const createTableQuery = `
-    CREATE TABLE IF NOT EXISTS keycontact (
-      id UUID PRIMARY KEY NOT NULL,
-      name VARCHAR NOT NULL,
-      email VARCHAR NOT NULL,
-      phone VARCHAR NOT NULL,
-      organization VARCHAR NOT NULL,
-      designation VARCHAR NOT NULL
-    );
-  `;
-  try {
-    const client = await pool.connect();
-    await client.query(createTableQuery);
-    console.log("Table 'keycontact' created successfully");
-  } catch (err) {
-    console.error("Error creating table", err.stack);
-  } finally {
-  }
-};
+
 // Key Contact Form
 
 const addKeyContact = async (req, res) => {
@@ -156,7 +117,6 @@ const addKeyContact = async (req, res) => {
 };
 
 const getAllKeyContact = async (req, res) => {
-  createKeyContactTable();
   try {
     const allKeyContact = await pool.query("SELECT * FROM keycontact");
     res.status(200).json({ success: true, keyContacts: allKeyContact.rows });
@@ -248,23 +208,6 @@ const getAllkeyContactCount = async (req, res) => {
   }
 };
 
-const createPropertiesAccessTable = async () => {
-  const createTableQuery = `
-    CREATE TABLE IF NOT EXISTS propertiesaccess (
-      id UUID PRIMARY KEY NOT NULL,
-      Property VARCHAR NOT NULL,
-      isEnabled BOOLEAN NOT NULL
-    );
-  `;
-  try {
-    const client = await pool.connect();
-    await client.query(createTableQuery);
-    console.log("Table 'propertiesAccess' created successfully");
-  } catch (err) {
-    console.error("Error creating table", err.stack);
-  } finally {
-  }
-};
 const addPropertiesAccess = async (req, res) => {
   try {
     const { id, Property, isEnabled } = req.body;
@@ -306,7 +249,6 @@ const UpdatePropertiesAccess = async (req, res) => {
 };
 
 const getAllPropertiesAccess = async (req, res) => {
-  createPropertiesAccessTable();
   try {
     const allPropertiesAccess = await pool.query(
       "SELECT * FROM propertiesAccess"
