@@ -2,6 +2,28 @@ const pool = require("../db");
 const uuid = require("uuid");
 const cloudinary = require("cloudinary");
 
+const createEventsTable = async () => {
+  const createTableQuery = `
+    CREATE TABLE IF NOT EXISTS events (
+      id UUID PRIMARY KEY NOT NULL,
+      title VARCHAR NOT NULL,
+      shortdescription TEXT NOT NULL,
+      fileid VARCHAR NOT NULL,
+      fileurl VARCHAR NOT NULL,
+      createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+      eventsdatetime TIMESTAMP WITHOUT TIME ZONE,
+      link VARCHAR
+    );
+  `;
+  try {
+    const client = await pool.connect();
+    await client.query(createTableQuery);
+    console.log("Table 'events' created successfully");
+  } catch (err) {
+    console.error("Error creating table", err.stack);
+  } finally {
+  }
+};
 // events CRUD
 exports.createEvents = async (req, res) => {
   try {
@@ -40,6 +62,7 @@ exports.createEvents = async (req, res) => {
 };
 
 exports.getAllEvents = async (req, res) => {
+  createEventsTable();
   try {
     const events = await pool.query("SELECT * FROM events");
     res.status(200).json({

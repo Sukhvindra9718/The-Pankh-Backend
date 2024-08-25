@@ -1,6 +1,28 @@
 // userController.js
 const pool = require('../db');
 
+const createUsersTable = async () => {
+  const createTableQuery = `
+    CREATE TABLE IF NOT EXISTS users (
+      id SERIAL PRIMARY KEY,
+      username VARCHAR(40) UNIQUE NOT NULL,
+      password VARCHAR NOT NULL,
+      phonenumber VARCHAR NOT NULL,
+      role VARCHAR NOT NULL,
+      fileid VARCHAR NOT NULL,
+      fileurl VARCHAR NOT NULL,
+      createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    );
+  `;
+  try {
+    const client = await pool.connect();
+    await client.query(createTableQuery);
+    console.log("Table 'users' created successfully");
+  } catch (err) {
+    console.error("Error creating table", err.stack);
+  } finally {
+  }
+};
 const getUserById = async (req, res) => {
   try {
     const user = await pool.query('SELECT * FROM users WHERE id = $1', [req.user.id]);
@@ -95,8 +117,13 @@ const deleteUser = async (req, res) => {
 
 
 const getAllUsers = async (req, res) => {
+  createUsersTable();
   try {
+    console.log("Get all users");
     const allUsers = await pool.query('SELECT * FROM users');
+    if(allUsers.rows.length === 0) {
+      return res.status(404).json({ success: false, msg: 'No users found' });
+    }
     res.status(200).json({success:true,users:allUsers.rows});
   } catch (error) {
     res.status(500).send({success: false,userError:'Server Error', error: error.message});

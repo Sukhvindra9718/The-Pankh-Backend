@@ -1,8 +1,27 @@
 const pool = require("../db");
-const fs = require("fs");
 const uuid = require("uuid");
 const cloudinary = require("cloudinary");
 
+const createImagesTable = async () => {
+  const createTableQuery = `
+    CREATE TABLE IF NOT EXISTS images (
+      id UUID PRIMARY KEY NOT NULL,
+      title VARCHAR NOT NULL,
+      description TEXT NOT NULL,
+      fileid VARCHAR NOT NULL,
+      fileurl VARCHAR NOT NULL,
+      createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    );
+  `;
+  try {
+    const client = await pool.connect();
+    await client.query(createTableQuery);
+    console.log("Table 'images' created successfully");
+  } catch (err) {
+    console.error("Error creating table", err.stack);
+  } finally {
+  }
+};
 // Images CRUD
 exports.addImage = async (req, res) => {
   try {
@@ -42,6 +61,7 @@ exports.addImage = async (req, res) => {
 };
 
 exports.getAllImages = async (req, res) => {
+  createImagesTable();
   try {
     console.log("get all images");
     const images = await pool.query("SELECT * FROM images");

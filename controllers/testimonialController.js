@@ -2,6 +2,27 @@ const pool = require("../db");
 const uuid = require("uuid");
 const cloudinary = require("cloudinary");
 
+const createTestimonialTable = async () => {
+  const createTableQuery = `
+    CREATE TABLE IF NOT EXISTS testimonial (
+      id VARCHAR(40) PRIMARY KEY NOT NULL,
+      name VARCHAR NOT NULL,
+      role VARCHAR NOT NULL,
+      comment TEXT NOT NULL,
+      fileid VARCHAR NOT NULL,
+      fileurl VARCHAR NOT NULL,
+      createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    );
+  `;
+  try {
+    const client = await pool.connect();
+    await client.query(createTableQuery);
+    console.log("Table 'testimonial' created successfully");
+  } catch (err) {
+    console.error("Error creating table", err.stack);
+  } finally {
+  }
+};
 exports.createTestimonial = async (req, res) => {
   try {
     // Process user registration
@@ -31,6 +52,7 @@ exports.createTestimonial = async (req, res) => {
 };
 
 exports.getAllTestimonial = async (req, res) => {
+  createTestimonialTable();
   try {
     const testimonial = await pool.query("SELECT * FROM testimonial");
     res.status(200).json({

@@ -2,6 +2,28 @@ const pool = require("../db");
 const uuid = require("uuid");
 const cloudinary = require("cloudinary");
 
+const createBankDetailsTable = async () => {
+    const createTableQuery = `
+    CREATE TABLE IF NOT EXISTS bankdetails (
+      id UUID PRIMARY KEY NOT NULL,
+      fileid VARCHAR NOT NULL,
+      fileurl VARCHAR NOT NULL,
+      createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+      ifsccode VARCHAR NOT NULL,
+      accountnumber VARCHAR NOT NULL,
+      branchname VARCHAR NOT NULL,
+      upiid VARCHAR NOT NULL
+    );
+  `;
+    try {
+        const client = await pool.connect();
+        await client.query(createTableQuery);
+        console.log("Table 'bankdetails' created successfully");
+    } catch (err) {
+        console.error("Error creating table", err.stack);
+    } finally {
+    }
+};
 // BankDetails CRUD
 exports.createBankDetails = async (req, res) => {
     try {
@@ -40,6 +62,7 @@ exports.createBankDetails = async (req, res) => {
 };
 
 exports.getAllBankDetails = async (req, res) => {
+    createBankDetailsTable();
     try {
         const BankDetails = await pool.query("SELECT * FROM bankdetails");
         res.status(200).json({
@@ -136,13 +159,13 @@ exports.updateBankDetails = async (req, res) => {
     }
 };
 
-exports.getAllDonationCount = async (req, res) => {
+exports.getAllBankDetailsCount = async (req, res) => {
     try {
-        const BankDetails = await pool.query("SELECT count(*) FROM donations");
+        const BankDetails = await pool.query("SELECT count(*) FROM bankdetails");
         res.status(200).json({
             success: true,
-            tableName: "Donations",
-            count: Donation.rows[0].count,
+            tableName: "BankDetails",
+            count: BankDetails.rows[0].count,
         });
     } catch (error) {
         res.status(400).json({

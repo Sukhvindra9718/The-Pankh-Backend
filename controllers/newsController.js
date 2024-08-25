@@ -3,10 +3,34 @@ const fs = require("fs");
 const uuid = require("uuid");
 const cloudinary = require("cloudinary");
 
+const createNewsTable = async () => {
+  const createTableQuery = `
+    CREATE TABLE IF NOT EXISTS news (
+      id UUID PRIMARY KEY NOT NULL,
+      title VARCHAR NOT NULL,
+      shortdescription TEXT NOT NULL,
+      longdescription TEXT NOT NULL,
+      fileid VARCHAR NOT NULL,
+      fileurl VARCHAR NOT NULL,
+      createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+      userid VARCHAR NOT NULL,
+      newsdatetime TIMESTAMP WITHOUT TIME ZONE,
+      link VARCHAR
+    );
+  `;
+  try {
+    const client = await pool.connect();
+    await client.query(createTableQuery);
+    console.log("Table 'news' created successfully");
+  } catch (err) {
+    console.error("Error creating table", err.stack);
+  } finally {
+  }
+};
 // News CRUD
 exports.createNews = async (req, res) => {
   try {
-    const { title, shortdescription, newsdatetime, createdat, longdescription, file, link } = req.body;
+    const { title, shortdescription, newsdatetime, longdescription, file, link } = req.body;
     const userId = req.user.id;
     const created_at = new Date();
     const id = uuid.v4();
@@ -44,6 +68,7 @@ exports.createNews = async (req, res) => {
 };
 
 exports.getAllNews = async (req, res) => {
+  createNewsTable();
   try {
     const news = await pool.query("SELECT * FROM news");
     res.status(200).json({
@@ -147,7 +172,6 @@ exports.updateNews = async (req, res) => {
 exports.getAllNewsCount = async (req, res) => {
   try {
     const news = await pool.query("SELECT count(*) FROM news");
-    console.log(news.rows);
     res.status(200).json({
       success: true,
       tableName: "news",

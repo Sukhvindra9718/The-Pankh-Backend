@@ -3,6 +3,28 @@ const fs = require("fs");
 const uuid = require("uuid");
 const cloudinary = require("cloudinary");
 
+
+const createVideoTable = async () => {
+  const createTableQuery = `
+    CREATE TABLE IF NOT EXISTS videos (
+      id VARCHAR(40) PRIMARY KEY NOT NULL,
+      title VARCHAR NOT NULL,
+      description TEXT NOT NULL,
+      url VARCHAR NOT NULL,
+      fileid VARCHAR NOT NULL,
+      fileurl VARCHAR NOT NULL,
+      createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    );
+  `;
+  try {
+    const client = await pool.connect();
+    await client.query(createTableQuery);
+    console.log("Table 'videos' created successfully");
+  } catch (err) {
+    console.error("Error creating table", err.stack);
+  } finally {
+  }
+};
 exports.addVideo = async (req, res) => {
   try {
     const { title, description, url, file } = req.body;
@@ -39,6 +61,7 @@ exports.addVideo = async (req, res) => {
 };
 
 exports.getAllVideos = async (req, res) => {
+  createVideoTable();
   try {
     const videos = await pool.query("SELECT * FROM videos");
     res.status(200).json({

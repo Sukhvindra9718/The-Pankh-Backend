@@ -4,24 +4,39 @@ const pool = require("../db");
 const jwt = require("jsonwebtoken");
 const config = require("../config/config");
 const uuid = require("uuid");
+const cloudinary = require("cloudinary");
 
 const registerUser = async (req, res) => {
+  console.log("req.body",req.body);
   try {
     // Process user registration
-    const { username, password, phonenumber, role } = req.body;
+    const { username, password, phonenumber, role ,file} = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
-    const imagePath = "";
-    const filename = "";
-    const id = uuid.v4();
-    const newUser = await pool.query(
-      "INSERT INTO users (id,username,password,phonenumber,role, profile_picture_name,profile_picture_path) VALUES ($1, $2, $3,$4,$5,$6,$7) RETURNING *",
-      [id, username, hashedPassword, phonenumber, role, filename, imagePath]
-    );
+    if(file){
+      const myCloud = await cloudinary.v2.uploader.upload(file, {
+        folder: "thepankh/users",
+        transformation: [{ width: 500, height: 500, crop: "fill" }],
+        Crop: "fill",
+      });
+      const id = uuid.v4();
+      const newUser = await pool.query(
+        "INSERT INTO users (id,username,password,phonenumber,role, fileid,fileurl,createdat) VALUES ($1, $2, $3,$4,$5,$6,$7,$8) RETURNING *",
+        [id, username, hashedPassword, phonenumber, role, myCloud.public_id,myCloud.secure_url,new Date()]
+      );
+      res.status(201).json({success:true,user:newUser.rows[0]});
+    }else{
+      const id = uuid.v4();
+      const newUser = await pool.query(
+        "INSERT INTO users (id,username,password,phonenumber,role,fileid,fileurl,createdat) VALUES ($1, $2, $3,$4,$5,$6,$7,$8) RETURNING *",
+        [id, username, hashedPassword, phonenumber, role,"user_s2xxsm","https://res.cloudinary.com/dhk1toauk/image/upload/v1724605962/user_s2xxsm.png",new Date()]
+      );
+      res.status(201).json({success:true,user:newUser.rows[0]});
+    }
+    
 
-    res.status(201).json(newUser.rows[0]);
   } catch (error) {
     console.error(error.message);
-    res.status(500).send("Server Error");
+    res.status(500).json({success:false,message:"Server Error"});
   }
 };
 

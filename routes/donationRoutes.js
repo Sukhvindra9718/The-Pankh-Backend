@@ -1,5 +1,4 @@
-const { getAllDonationCount } = require("../controllers/donationController.js");
-const { createDonation, getAllDonation, deleteDonation, updateDonation } = require("../controllers/donationController.js");
+const { createDonation, getAllDonation, deleteDonation, updateDonation,getAllDonationCount } = require("../controllers/donationController.js");
 const router = require("express").Router();
 const authMiddleware = require("../middleware/authMiddleware.js");
 

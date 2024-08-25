@@ -17,12 +17,12 @@ readdirSync("./routes").map((route) => app.use("/api", require("./routes/" + rou
 app.use("/public", express.static(path.join(__dirname, "public")));
 
 // app.use(cors());
-app.use(cors({ origin: "https://thepankh.info" }));
+app.use(cors({ origin: "http://thepankh.info" }));
 app.use(express.json({ limit: "50mb" }));
 
 // Import Routes
 app.use("/api/auth", require("./routes/authRoutes"));
-app.use("/api/user", require("./routes/userRoutes"));
+app.use("/api/v1", require("./routes/userRoutes"));
 app.use("/api/common", require("./routes/commonRoutes"));
 app.use("/api/v1", require("./routes/videoRoutes"));
 app.use("/api/v1", require("./routes/imagesRoutes"));
@@ -60,7 +60,7 @@ app.use(express.static(path.join(__dirname, 'build')));
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
-console.log(path.join(__dirname, 'build', 'index.html'))
+
 // Database Connection
 pool.connect((err, client, release) => {
   if (err) {
@@ -74,188 +74,78 @@ pool.connect((err, client, release) => {
     console.log("Database connected:", result.rows);
   });
 });
-
-const createDonationTable = async () => {
+const createPropertiesAccessTable = async () => {
   const createTableQuery = `
-    CREATE TABLE IF NOT EXISTS donations (
-      id VARCHAR(40) PRIMARY KEY NOT NULL,
-      fileid VARCHAR NOT NULL,
-      fileurl VARCHAR NOT NULL,
-      createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-      fullname VARCHAR NOT NULL,
-      email VARCHAR NOT NULL,
+  CREATE TABLE IF NOT EXISTS propertiesaccess (
+    id UUID PRIMARY KEY NOT NULL,
+    Property VARCHAR NOT NULL,
+    isEnabled BOOLEAN NOT NULL
+  );
+`;
+  try {
+      const client = await pool.connect();
+      await client.query(createTableQuery);
+      // console.log("Table 'propertiesAccess' created successfully");
+  } catch (err) {
+      console.error("Error creating table", err.stack);
+  } finally {
+  }
+};
+const createUsersTable = async () => {
+  const createTableQuery = `
+    CREATE TABLE IF NOT EXISTS users (
+      id UUID PRIMARY KEY,
+      username VARCHAR(40) UNIQUE NOT NULL,
+      password VARCHAR NOT NULL,
       phonenumber VARCHAR NOT NULL,
-      country VARCHAR NOT NULL,
-      amount BIGINT NOT NULL,
-      utrnumber VARCHAR NOT NULL,
-      donationdatetime TIMESTAMP WITHOUT TIME ZONE,
-      remarks VARCHAR
-    );
-  `;
-
-  try {
-    const client = await pool.connect();
-    await client.query(createTableQuery);
-    console.log("Table 'donations' created successfully");
-  } catch (err) {
-    console.error('Error creating table', err.stack);
-  } finally {
-
-  }
-};
-
-const createBankDetailsTable = async () => {
-  const createTableQuery = `
-    CREATE TABLE IF NOT EXISTS bankdetails (
-      id VARCHAR(40) PRIMARY KEY NOT NULL,
-      fileid VARCHAR NOT NULL,
-      fileurl VARCHAR NOT NULL,
-      createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-      ifsccode VARCHAR NOT NULL,
-      accountnumber VARCHAR NOT NULL,
-      upiid VARCHAR NOT NULL,
-      branchname VARCHAR NOT NULL
-    );
-  `;
-
-  try {
-    const client = await pool.connect();
-    await client.query(createTableQuery);
-    console.log("Table 'bankdetails' created successfully");
-  } catch (err) {
-    console.error('Error creating table', err.stack);
-  } finally {
-
-  }
-};
-
-const createFundTable = async () => {
-  const createTableQuery = `
-    CREATE TABLE IF NOT EXISTS fund (
-      id VARCHAR(40) PRIMARY KEY NOT NULL,
-      fileid VARCHAR NOT NULL,
-      fileurl VARCHAR NOT NULL,
-      createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-      title VARCHAR NOT NULL,
-      raisedprice VARCHAR NOT NULL,
-      goalprice VARCHAR NOT NULL,
-      description VARCHAR NOT NULL
-    );
-  `;
-
-  try {
-    const client = await pool.connect();
-    await client.query(createTableQuery);
-    console.log("Table 'fund' created successfully");
-  } catch (err) {
-    console.error('Error creating table', err.stack);
-  } finally {
-
-  }
-};
-
-const createVideoTable = async () => {
-  const createTableQuery = `
-    CREATE TABLE IF NOT EXISTS videos (
-      id VARCHAR(40) PRIMARY KEY NOT NULL,
-      title VARCHAR NOT NULL,
-      description VARCHAR NOT NULL,
-      url VARCHAR NOT NULL,
+      role VARCHAR NOT NULL,
       fileid VARCHAR NOT NULL,
       fileurl VARCHAR NOT NULL,
       createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
     );
   `;
-
   try {
     const client = await pool.connect();
     await client.query(createTableQuery);
-    console.log("Table 'videos' created successfully");
+    console.log("Table 'users' created successfully");
   } catch (err) {
-    console.error('Error creating table', err.stack);
+    console.error("Error creating table", err.stack);
   } finally {
-
   }
 };
+// createUsersTable();
+// createPropertiesAccessTable();
 
-const createEventsTable = async () => {
-  const createTableQuery = `
-    CREATE TABLE IF NOT EXISTS events (
-      id VARCHAR(40) PRIMARY KEY NOT NULL,
-      title VARCHAR NOT NULL,
-      shortdescription VARCHAR NOT NULL,
-      eventsdatetime TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-      fileid VARCHAR NOT NULL,
-      fileurl VARCHAR NOT NULL,
-      createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-      link VARCHAR NOT NULL
-    );
+// I want to delete all tables present in the database
+const deleteAllTables = async () => {
+  const deleteTableQuery = `
+    DROP TABLE IF EXISTS bankdetails;
+    DROP TABLE IF EXISTS banner;
+    DROP TABLE IF EXISTS carousal;
+    DROP TABLE IF EXISTS contactus;
+    DROP TABLE IF EXISTS donations;
+    DROP TABLE IF EXISTS events;
+    DROP TABLE IF EXISTS fund;
+    DROP TABLE IF EXISTS images;
+    DROP TABLE IF EXISTS keycontact;
+    DROP TABLE IF EXISTS news;
+    DROP TABLE IF EXISTS projects;
+    DROP TABLE IF EXISTS propertiesaccess;
+    DROP TABLE IF EXISTS testimonial;
+    DROP TABLE IF EXISTS users;
+    DROP TABLE IF EXISTS videos;
+    DROP TABLE IF EXISTS volunteer;
   `;
-
   try {
     const client = await pool.connect();
-    await client.query(createTableQuery);
-    console.log("Table 'events' created successfully");
+    await client.query(deleteTableQuery);
+    console.log("Tables deleted successfully");
   } catch (err) {
-    console.error('Error creating table', err.stack);
+    console.error("Error deleting tables", err.stack);
   } finally {
-
   }
-};
- 
-const createNewsTable = async () => {
-  const createTableQuery = `
-    CREATE TABLE IF NOT EXISTS news (
-      id VARCHAR(40) PRIMARY KEY NOT NULL,
-      title VARCHAR NOT NULL,
-      shortdescription VARCHAR NOT NULL,
-      newsdatetime TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-      longdescription VARCHAR NOT NULL,
-      userid VARCHAR NOT NULL,
-      fileid VARCHAR NOT NULL,
-      fileurl VARCHAR NOT NULL,
-      createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-      link VARCHAR NOT NULL
-    );
-  `;
-
-  try {
-    const client = await pool.connect();
-    await client.query(createTableQuery);
-    console.log("Table 'news' created successfully");
-  } catch (err) {
-    console.error('Error creating table', err.stack);
-  } finally {
-
-  }
-};
-
-// createDonationTable();
-// createBankDetailsTable();
-// createFundTable();
-// createVideoTable();
-// createEventsTable();
-// createNewsTable();
-
-
-
-// Delete table
-// const deleteTable = async (table) => {
-//   const deleteTableQuery = `
-//     DROP TABLE IF EXISTS ${table};
-//   `;
-//   try {
-//     const client = await pool.connect();
-//     await client.query(deleteTableQuery);
-//     console.log(`Table ${table} deleted successfully`);
-//   } catch (err) {
-//     console.error('Error deleting table', err.stack);
-//   } finally {
-
-//   }
-// };
-
-
+}
+deleteAllTables();
 pool.on("error", (err) => {
   console.error("Unexpected error on idle client", err);
   process.exit(-1);

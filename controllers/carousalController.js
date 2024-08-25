@@ -2,6 +2,26 @@ const pool = require("../db");
 const uuid = require("uuid");
 const cloudinary = require("cloudinary");
 
+const createCarousalTable = async () => {
+  const createTableQuery = `
+    CREATE TABLE IF NOT EXISTS carousal (
+      id UUID PRIMARY KEY NOT NULL,
+      title VARCHAR NOT NULL,
+      description TEXT NOT NULL,
+      fileid VARCHAR NOT NULL,
+      fileurl VARCHAR NOT NULL,
+      createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    );
+  `;
+  try {
+    const client = await pool.connect();
+    await client.query(createTableQuery);
+    console.log("Table 'carousal' created successfully");
+  } catch (err) {
+    console.error("Error creating table", err.stack);
+  } finally {
+  }
+};
 // Images CRUD
 exports.addCarousal = async (req, res) => {
   try {
@@ -39,6 +59,7 @@ exports.addCarousal = async (req, res) => {
 };
 
 exports.getAllCarousals = async (req, res) => {
+  createCarousalTable();
   try {
     console.log("get all carousals");
     const carousals = await pool.query("SELECT * FROM carousal");

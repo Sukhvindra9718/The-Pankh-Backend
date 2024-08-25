@@ -1,9 +1,26 @@
 const pool = require("../db");
-const fs = require("fs");
 const uuid = require("uuid");
 const cloudinary = require("cloudinary");
 
-// Images CRUD
+const createBannerTable = async () => {
+  const createTableQuery = `
+    CREATE TABLE IF NOT EXISTS banner (
+      id UUID PRIMARY KEY NOT NULL,
+      pagename VARCHAR NOT NULL,
+      fileid VARCHAR NOT NULL,
+      fileurl VARCHAR NOT NULL,
+      createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    );
+  `;
+  try {
+    const client = await pool.connect();
+    await client.query(createTableQuery);
+    console.log("Table 'banner' created successfully");
+  } catch (err) {
+    console.error("Error creating table", err.stack);
+  } finally {
+  }
+};
 exports.addBanner = async (req, res) => {
   try {
     const { pagename, file } = req.body;
@@ -32,6 +49,7 @@ exports.addBanner = async (req, res) => {
 };
 
 exports.getAllBanners = async (req, res) => {
+  createBannerTable();
   try {
     const banners = await pool.query("SELECT * FROM banner");
     res.status(200).json({
