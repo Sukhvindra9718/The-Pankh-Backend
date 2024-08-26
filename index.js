@@ -62,385 +62,390 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
-// Database Connection
-pool.connect((err, client, release) => {
-  if (err) {
-    return console.error("Error acquiring client", err.stack);
-  }
-  client.query("SELECT NOW()", (err, result) => {
-    release();
-    if (err) {
-      return console.error("Error executing query", err.stack);
-    }
-    console.log("Database connected:", result.rows);
-  });
-});
+
+
 const createBankDetailsTable = async () => {
   const createTableQuery = `
-  CREATE TABLE IF NOT EXISTS bankdetails (
-    id UUID PRIMARY KEY NOT NULL,
-    fileid VARCHAR NOT NULL,
-    fileurl VARCHAR NOT NULL,
-    createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    ifsccode VARCHAR NOT NULL,
-    accountnumber VARCHAR NOT NULL,
-    branchname VARCHAR NOT NULL,
-    upiid VARCHAR NOT NULL
-  );
-`;
+    CREATE TABLE IF NOT EXISTS bankdetails (
+      id CHAR(36) PRIMARY KEY NOT NULL,
+      fileid VARCHAR(255) NOT NULL,
+      fileurl VARCHAR(255) NOT NULL,
+      createdat TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      ifsccode VARCHAR(11) NOT NULL,
+      accountnumber VARCHAR(20) NOT NULL,
+      branchname VARCHAR(255) NOT NULL,
+      upiid VARCHAR(255) NOT NULL
+    );
+  `;
+  
   try {
-      const client = await pool.connect();
-      await client.query(createTableQuery);
-      console.log("Table 'bankdetails' created successfully");
+    const connection = await pool.getConnection(); // Get a connection from the pool
+    await connection.query(createTableQuery);
+    console.log("Table 'bankdetails' created successfully");
   } catch (err) {
-      console.error("Error creating table", err.stack);
+    console.error("Error creating table", err.stack);
   } finally {
+    //connection.release(); // Release the connection back to the pool
   }
 };
 const createBannerTable = async () => {
   const createTableQuery = `
     CREATE TABLE IF NOT EXISTS banner (
-      id UUID PRIMARY KEY NOT NULL,
-      pagename VARCHAR NOT NULL,
-      fileid VARCHAR NOT NULL,
-      fileurl VARCHAR NOT NULL,
-      createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      id CHAR(36) PRIMARY KEY NOT NULL,
+      pagename VARCHAR(255) NOT NULL,
+      fileid VARCHAR(255) NOT NULL,
+      fileurl VARCHAR(255) NOT NULL,
+      createdat TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
   `;
+  
   try {
-    const client = await pool.connect();
-    await client.query(createTableQuery);
+    const connection = await pool.getConnection(); // Get a connection from the pool
+    await connection.query(createTableQuery);
     console.log("Table 'banner' created successfully");
   } catch (err) {
     console.error("Error creating table", err.stack);
   } finally {
+    //connection.release(); // Release the connection back to the pool
   }
 };
 const createCarousalTable = async () => {
   const createTableQuery = `
     CREATE TABLE IF NOT EXISTS carousal (
-      id UUID PRIMARY KEY NOT NULL,
-      title VARCHAR NOT NULL,
+      id CHAR(36) PRIMARY KEY NOT NULL,
+      title VARCHAR(255) NOT NULL,
       description TEXT NOT NULL,
-      fileid VARCHAR NOT NULL,
-      fileurl VARCHAR NOT NULL,
-      createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      fileid VARCHAR(255) NOT NULL,
+      fileurl VARCHAR(255) NOT NULL,
+      createdat TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
   `;
+
   try {
-    const client = await pool.connect();
-    await client.query(createTableQuery);
+    const connection = await pool.getConnection(); // Get a connection from the pool
+    await connection.query(createTableQuery);
     console.log("Table 'carousal' created successfully");
   } catch (err) {
     console.error("Error creating table", err.stack);
   } finally {
+    //if (connection) connection.release(); // Release the connection back to the pool
   }
 };
 const createContactUsTable = async () => {
   const createTableQuery = `
     CREATE TABLE IF NOT EXISTS contactus (
-      id UUID PRIMARY KEY NOT NULL,
-      name VARCHAR NOT NULL,
-      email VARCHAR NOT NULL,
-      phone VARCHAR NOT NULL,
-      subject VARCHAR NOT NULL,
+      id CHAR(36) PRIMARY KEY NOT NULL,
+      name VARCHAR(255) NOT NULL,
+      email VARCHAR(255) NOT NULL,
+      phone VARCHAR(20) NOT NULL,
+      subject VARCHAR(255) NOT NULL,
       message TEXT NOT NULL,
-      createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      createdat TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
   `;
+
   try {
-    const client = await pool.connect();
-    await client.query(createTableQuery);
+    const connection = await pool.getConnection(); // Get a connection from the pool
+    await connection.query(createTableQuery);
     console.log("Table 'contactus' created successfully");
   } catch (err) {
     console.error("Error creating table", err.stack);
   } finally {
+    //if (connection) connection.release(); // Release the connection back to the pool
   }
 };
+
 const createKeyContactTable = async () => {
   const createTableQuery = `
     CREATE TABLE IF NOT EXISTS keycontact (
-      id UUID PRIMARY KEY NOT NULL,
-      name VARCHAR NOT NULL,
-      email VARCHAR NOT NULL,
-      phone VARCHAR NOT NULL,
-      organization VARCHAR NOT NULL,
-      designation VARCHAR NOT NULL
+      id CHAR(36) PRIMARY KEY NOT NULL,
+      name VARCHAR(255) NOT NULL,
+      email VARCHAR(255) NOT NULL,
+      phone VARCHAR(20) NOT NULL,
+      organization VARCHAR(255) NOT NULL,
+      designation VARCHAR(255) NOT NULL
     );
   `;
+  
   try {
-    const client = await pool.connect();
-    await client.query(createTableQuery);
+    const connection = await pool.getConnection(); // Get a connection from the pool
+    await connection.query(createTableQuery);
     console.log("Table 'keycontact' created successfully");
   } catch (err) {
     console.error("Error creating table", err.stack);
   } finally {
+    //if (connection) connection.release(); // Release the connection back to the pool
   }
 };
+
 const createPropertiesAccessTable = async () => {
   const createTableQuery = `
-  CREATE TABLE IF NOT EXISTS propertiesaccess (
-    id UUID PRIMARY KEY NOT NULL,
-    Property VARCHAR NOT NULL,
-    isEnabled BOOLEAN NOT NULL
-  );
-`;
+    CREATE TABLE IF NOT EXISTS propertiesaccess (
+      id CHAR(36) PRIMARY KEY NOT NULL,
+      Property VARCHAR(255) NOT NULL,
+      isEnabled BOOLEAN NOT NULL
+    );
+  `;
+  
   try {
-      const client = await pool.connect();
-      await client.query(createTableQuery);
-      // console.log("Table 'propertiesAccess' created successfully");
+    const connection = await pool.getConnection(); // Get a connection from the pool
+    await connection.query(createTableQuery);
+    console.log("Table 'propertiesaccess' created successfully");
   } catch (err) {
-      console.error("Error creating table", err.stack);
+    console.error("Error creating table", err.stack);
   } finally {
+    //if (connection) connection.release(); // Release the connection back to the pool
   }
 };
+
 const createDonationTable = async () => {
-  const createTableQuery = `CREATE TABLE IF NOT EXISTS donations (
-      id UUID PRIMARY KEY NOT NULL,
-      fileid VARCHAR NOT NULL,
-      fileurl VARCHAR NOT NULL,
-      createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-      fullname VARCHAR NOT NULL,
-      email VARCHAR NOT NULL,
-      phonenumber VARCHAR NOT NULL,
-      country VARCHAR NOT NULL,
-      amount VARCHAR NOT NULL,
-      utrnumber VARCHAR NOT NULL,
-      donationdatetime TIMESTAMP WITHOUT TIME ZONE,
+  const createTableQuery = `
+    CREATE TABLE IF NOT EXISTS donations (
+      id CHAR(36) PRIMARY KEY NOT NULL,
+      fileid VARCHAR(255) NOT NULL,
+      fileurl VARCHAR(255) NOT NULL,
+      createdat TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      fullname VARCHAR(255) NOT NULL,
+      email VARCHAR(255) NOT NULL,
+      phonenumber VARCHAR(20) NOT NULL,
+      country VARCHAR(255) NOT NULL,
+      amount DECIMAL(10, 2) NOT NULL,
+      utrnumber VARCHAR(255) NOT NULL,
+      donationdatetime TIMESTAMP,
       remarks TEXT
-  )`;
+    );
+  `;
+
   try {
-      const client = await pool.connect();
-      await client.query(createTableQuery);
-      console.log("Table 'donations' created successfully");
+    const connection = await pool.getConnection(); // Get a connection from the pool
+    await connection.query(createTableQuery);
+    console.log("Table 'donations' created successfully");
   } catch (err) {
-      console.error("Error creating table", err.stack);
+    console.error("Error creating table", err.stack);
   } finally {
+    //if (connection) connection.release(); // Release the connection back to the pool
   }
 };
+
 const createEventsTable = async () => {
   const createTableQuery = `
     CREATE TABLE IF NOT EXISTS events (
-      id UUID PRIMARY KEY NOT NULL,
-      title VARCHAR NOT NULL,
+      id CHAR(36) PRIMARY KEY NOT NULL,
+      title VARCHAR(255) NOT NULL,
       shortdescription TEXT NOT NULL,
-      fileid VARCHAR NOT NULL,
-      fileurl VARCHAR NOT NULL,
-      createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-      eventsdatetime TIMESTAMP WITHOUT TIME ZONE,
-      link VARCHAR
+      fileid VARCHAR(255) NOT NULL,
+      fileurl VARCHAR(255) NOT NULL,
+      createdat TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      eventsdatetime TIMESTAMP,
+      link VARCHAR(255)
     );
   `;
+  
   try {
-    const client = await pool.connect();
-    await client.query(createTableQuery);
+    const connection = await pool.getConnection(); // Get a connection from the pool
+    await connection.query(createTableQuery);
     console.log("Table 'events' created successfully");
   } catch (err) {
     console.error("Error creating table", err.stack);
   } finally {
+    //if (connection) connection.release(); // Release the connection back to the pool
   }
 };
+
 const createFundTable = async () => {
   const createTableQuery = `
     CREATE TABLE IF NOT EXISTS fund (
-      id UUID PRIMARY KEY NOT NULL,
-      title VARCHAR NOT NULL,
+      id CHAR(36) PRIMARY KEY NOT NULL,
+      title VARCHAR(255) NOT NULL,
       raisedprice INT NOT NULL,
       goalprice INT NOT NULL,
       description TEXT NOT NULL,
-      fileid VARCHAR NOT NULL,
-      fileurl VARCHAR NOT NULL,
-      createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      fileid VARCHAR(255) NOT NULL,
+      fileurl VARCHAR(255) NOT NULL,
+      createdat TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
   `;
+  
   try {
-    const client = await pool.connect();
-    await client.query(createTableQuery);
+    const connection = await pool.getConnection(); // Get a connection from the pool
+    await connection.query(createTableQuery);
     console.log("Table 'fund' created successfully");
   } catch (err) {
     console.error("Error creating table", err.stack);
   } finally {
+    //if (connection) connection.release(); // Release the connection back to the pool
   }
 };
+
 const createImagesTable = async () => {
   const createTableQuery = `
     CREATE TABLE IF NOT EXISTS images (
-      id UUID PRIMARY KEY NOT NULL,
-      title VARCHAR NOT NULL,
+      id CHAR(36) PRIMARY KEY NOT NULL,
+      title VARCHAR(255) NOT NULL,
       description TEXT NOT NULL,
-      fileid VARCHAR NOT NULL,
-      fileurl VARCHAR NOT NULL,
-      createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      fileid VARCHAR(255) NOT NULL,
+      fileurl VARCHAR(255) NOT NULL,
+      createdat TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
   `;
+  
   try {
-    const client = await pool.connect();
-    await client.query(createTableQuery);
+    const connection = await pool.getConnection(); // Get a connection from the pool
+    await connection.query(createTableQuery);
     console.log("Table 'images' created successfully");
   } catch (err) {
     console.error("Error creating table", err.stack);
   } finally {
+    //if (connection) connection.release(); // Release the connection back to the pool
   }
 };
+
 const createNewsTable = async () => {
   const createTableQuery = `
     CREATE TABLE IF NOT EXISTS news (
-      id UUID PRIMARY KEY NOT NULL,
-      title VARCHAR NOT NULL,
+      id CHAR(36) PRIMARY KEY NOT NULL,
+      title VARCHAR(255) NOT NULL,
       shortdescription TEXT NOT NULL,
       longdescription TEXT NOT NULL,
-      fileid VARCHAR NOT NULL,
-      fileurl VARCHAR NOT NULL,
-      createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-      userid VARCHAR NOT NULL,
-      newsdatetime TIMESTAMP WITHOUT TIME ZONE,
-      link VARCHAR
+      fileid VARCHAR(255) NOT NULL,
+      fileurl VARCHAR(255) NOT NULL,
+      createdat TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      userid VARCHAR(255) NOT NULL,
+      newsdatetime TIMESTAMP,
+      link VARCHAR(255)
     );
   `;
+  
   try {
-    const client = await pool.connect();
-    await client.query(createTableQuery);
+    const connection = await pool.getConnection(); // Get a connection from the pool
+    await connection.query(createTableQuery);
     console.log("Table 'news' created successfully");
   } catch (err) {
     console.error("Error creating table", err.stack);
   } finally {
+    //if (connection) connection.release(); // Release the connection back to the pool
   }
 };
+
 const createProjectsTable = async () => {
   const createTableQuery = `
     CREATE TABLE IF NOT EXISTS projects (
-      id UUID PRIMARY KEY,
-      title VARCHAR NOT NULL,
+      id CHAR(36) PRIMARY KEY NOT NULL,
+      title VARCHAR(255) NOT NULL,
       description TEXT NOT NULL,
-      fileid VARCHAR NOT NULL,
-      fileurl VARCHAR NOT NULL,
-      createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      fileid VARCHAR(255) NOT NULL,
+      fileurl VARCHAR(255) NOT NULL,
+      createdat TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
   `;
+  
   try {
-    const client = await pool.connect();
-    await client.query(createTableQuery);
+    const connection = await pool.getConnection(); // Get a connection from the pool
+    await connection.query(createTableQuery);
     console.log("Table 'projects' created successfully");
   } catch (err) {
     console.error("Error creating table", err.stack);
   } finally {
+    //if (connection) connection.release(); // Release the connection back to the pool
   }
 };
+
 const createTestimonialTable = async () => {
   const createTableQuery = `
     CREATE TABLE IF NOT EXISTS testimonial (
       id VARCHAR(40) PRIMARY KEY NOT NULL,
-      name VARCHAR NOT NULL,
-      role VARCHAR NOT NULL,
+      name VARCHAR(255) NOT NULL,
+      role VARCHAR(255) NOT NULL,
       comment TEXT NOT NULL,
-      fileid VARCHAR NOT NULL,
-      fileurl VARCHAR NOT NULL,
-      createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      fileid VARCHAR(255) NOT NULL,
+      fileurl VARCHAR(255) NOT NULL,
+      createdat TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
   `;
+  
   try {
-    const client = await pool.connect();
-    await client.query(createTableQuery);
+    const connection = await pool.getConnection(); // Get a connection from the pool
+    await connection.query(createTableQuery);
     console.log("Table 'testimonial' created successfully");
   } catch (err) {
     console.error("Error creating table", err.stack);
   } finally {
+    //if (connection) connection.release(); // Release the connection back to the pool
   }
 };
-const createUsersTable = async () => {
-  const createTableQuery = `
-    CREATE TABLE IF NOT EXISTS users (
-      id UUID PRIMARY KEY,
-      username VARCHAR(40) UNIQUE NOT NULL,
-      password VARCHAR NOT NULL,
-      phonenumber VARCHAR NOT NULL,
-      role VARCHAR NOT NULL,
-      fileid VARCHAR NOT NULL,
-      fileurl VARCHAR NOT NULL,
-      createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
-    );
-  `;
-  try {
-    const client = await pool.connect();
-    await client.query(createTableQuery);
-    console.log("Table 'users' created successfully");
-  } catch (err) {
-    console.error("Error creating table", err.stack);
-  } finally {
-  }
-};
+
 const createVideoTable = async () => {
   const createTableQuery = `
     CREATE TABLE IF NOT EXISTS videos (
       id VARCHAR(40) PRIMARY KEY NOT NULL,
-      title VARCHAR NOT NULL,
+      title VARCHAR(255) NOT NULL,
       description TEXT NOT NULL,
-      url VARCHAR NOT NULL,
-      fileid VARCHAR NOT NULL,
-      fileurl VARCHAR NOT NULL,
-      createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      url VARCHAR(255) NOT NULL,
+      fileid VARCHAR(255) NOT NULL,
+      fileurl VARCHAR(255) NOT NULL,
+      createdat TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
   `;
+  
   try {
-    const client = await pool.connect();
-    await client.query(createTableQuery);
+    const connection = await pool.getConnection(); // Get a connection from the pool
+    await connection.query(createTableQuery);
     console.log("Table 'videos' created successfully");
   } catch (err) {
     console.error("Error creating table", err.stack);
   } finally {
+    //if (connection) connection.release(); // Release the connection back to the pool
   }
 };
+
 const createVolunteerTable = async () => {
   const createTableQuery = `
     CREATE TABLE IF NOT EXISTS volunteer (
       id VARCHAR(40) PRIMARY KEY NOT NULL,
-      username VARCHAR NOT NULL,
-      phonenumber VARCHAR NOT NULL,
-      role VARCHAR NOT NULL,
-      facebookurl VARCHAR NOT NULL,
-      twitterurl VARCHAR NOT NULL,
-      instagramurl VARCHAR NOT NULL,
-      linkedinurl VARCHAR NOT NULL,
-      fileid VARCHAR NOT NULL,
-      fileurl VARCHAR NOT NULL,
-      createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      username VARCHAR(255) NOT NULL,
+      phonenumber VARCHAR(255) NOT NULL,
+      role VARCHAR(255) NOT NULL,
+      facebookurl VARCHAR(255) NOT NULL,
+      twitterurl VARCHAR(255) NOT NULL,
+      instagramurl VARCHAR(255) NOT NULL,
+      linkedinurl VARCHAR(255) NOT NULL,
+      fileid VARCHAR(255) NOT NULL,
+      fileurl VARCHAR(255) NOT NULL,
+      createdat TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
   `;
- 
+
   try {
-    const client = await pool.connect();
-    await client.query(createTableQuery);
+    const connection = await pool.getConnection(); // Get a connection from the pool
+    await connection.query(createTableQuery);
     console.log("Table 'volunteer' created successfully");
   } catch (err) {
     console.error('Error creating table', err.stack);
   } finally {
- 
+    //if (connection) connection.release(); // Release the connection back to the pool
   }
 };
 
-createBankDetailsTable();
-createBannerTable();
-createCarousalTable();
-createContactUsTable();
-createKeyContactTable();
-createPropertiesAccessTable();
-createDonationTable();
-createEventsTable();
-createFundTable();
-createImagesTable();
-createNewsTable();
-createProjectsTable();
-createTestimonialTable();
-createUsersTable();
-createVideoTable();
-createVolunteerTable();
 
 
 
-pool.on("error", (err) => {
-  console.error("Unexpected error on idle client", err);
-  process.exit(-1);
-});
+// createBankDetailsTable();
+// createBannerTable();
+// createCarousalTable();
+// createContactUsTable();
+// createKeyContactTable();
+// createPropertiesAccessTable();
+// createDonationTable();
+// createEventsTable();
+// createFundTable();
+// createImagesTable();
+// createNewsTable();
+// createProjectsTable();
+// createTestimonialTable();
+// createVideoTable();
+// createVolunteerTable();
+
+
 const server = app.listen(PORT, (req, res) => {
   console.log(`Server is working on ${host}:${PORT}`);
 });
