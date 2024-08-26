@@ -2,7 +2,6 @@ const pool = require("../db");
 const uuid = require("uuid");
 const cloudinary = require("cloudinary");
 
-
 // Images CRUD
 exports.addImage = async (req, res) => {
   try {
@@ -11,10 +10,10 @@ exports.addImage = async (req, res) => {
 
     const myCloud = await cloudinary.v2.uploader.upload(file, {
       folder: "thepankh/galleryimages",
-      Crop: "fill",
+      crop: "fill",
     });
     await pool.query(
-      "INSERT INTO images (id,title,description,fileid,fileurl,createdat) VALUES ($1, $2, $3,$4,$5,$6) RETURNING *",
+      "INSERT INTO images (id, title, description, fileid, fileurl, createdat) VALUES (?, ?, ?, ?, ?, ?)",
       [
         id,
         title,
@@ -27,27 +26,25 @@ exports.addImage = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "Image Uploaded Succesfully",
+      message: "Image Uploaded Successfully",
     });
   } catch (error) {
-    console.log(error)
-    res
-      .status(500)
-      .send({
-        success: false,
-        userError: "Server Error",
-        error: error.message,
-      });
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      userError: "Server Error",
+      error: error.message,
+    });
   }
 };
 
 exports.getAllImages = async (req, res) => {
   try {
     console.log("get all images");
-    const images = await pool.query("SELECT * FROM images");
+    const [images] = await pool.query("SELECT * FROM images");
     res.status(200).json({
       success: true,
-      images: images.rows,
+      images: images,
     });
   } catch (error) {
     console.log(error);
@@ -62,13 +59,13 @@ exports.getAllImages = async (req, res) => {
 exports.getImage = async (req, res) => {
   try {
     const { id } = req.params;
-    const image = await pool.query("SELECT * FROM images WHERE id = $1", [id]);
-    if (image.rows.length === 0) {
+    const [image] = await pool.query("SELECT * FROM images WHERE id = ?", [id]);
+    if (image.length === 0) {
       return res.status(404).json({ success: false, msg: "Image not found" });
     }
     res.status(200).json({
       success: true,
-      image: image.rows[0],
+      image: image[0],
     });
   } catch (error) {
     res.status(400).json({
@@ -82,16 +79,16 @@ exports.getImage = async (req, res) => {
 exports.deleteImage = async (req, res) => {
   try {
     const { id } = req.params;
-    const image = await pool.query("SELECT * FROM images WHERE id = $1", [id]);
-    if (image) {
-      const fileid = image.rows[0].fileid;
+    const [image] = await pool.query("SELECT * FROM images WHERE id = ?", [id]);
+    if (image.length > 0) {
+      const fileid = image[0].fileid;
       await cloudinary.v2.uploader.destroy(fileid);
-      await pool.query("DELETE FROM images WHERE id = $1", [id]);
+      await pool.query("DELETE FROM images WHERE id = ?", [id]);
     }
 
     res.status(200).json({
       success: true,
-      message: "Image Deleted Succesfully",
+      message: "Image Deleted Successfully",
     });
   } catch (error) {
     res.status(400).json({
@@ -106,30 +103,30 @@ exports.updateImage = async (req, res) => {
   try {
     const { id } = req.params;
     const { title, description, file } = req.body;
-    const image = await pool.query("SELECT * FROM images WHERE id = $1", [id]);
-    if (image.rows.length === 0) {
+    const [image] = await pool.query("SELECT * FROM images WHERE id = ?", [id]);
+    if (image.length === 0) {
       return res.status(404).json({ success: false, msg: "Image not found" });
     }
     if (file) {
-      const fileid = image.rows[0].fileid;
+      const fileid = image[0].fileid;
       await cloudinary.v2.uploader.destroy(fileid);
       const myCloud = await cloudinary.v2.uploader.upload(file, {
         folder: "thepankh/galleryimages",
-        Crop: "fill",
+        crop: "fill",
       });
       await pool.query(
-        "UPDATE images SET fileid = $1, fileurl = $2,title = $3,description=$4 WHERE id = $5",
+        "UPDATE images SET fileid = ?, fileurl = ?, title = ?, description = ? WHERE id = ?",
         [myCloud.public_id, myCloud.secure_url, title, description, id]
       );
     } else {
       await pool.query(
-        "UPDATE images SET title = $1,description=$2 WHERE id = $3",
+        "UPDATE images SET title = ?, description = ? WHERE id = ?",
         [title, description, id]
       );
     }
     res.status(200).json({
       success: true,
-      message: "Image Updated Succesfully",
+      message: "Image Updated Successfully",
     });
   } catch (error) {
     res.status(400).json({
@@ -142,11 +139,11 @@ exports.updateImage = async (req, res) => {
 
 exports.getAllImagesCount = async (req, res) => {
   try {
-    const images = await pool.query("SELECT count(*) FROM images");
+    const [[imagesCount]] = await pool.query("SELECT COUNT(*) AS count FROM images");
     res.status(200).json({
       success: true,
-      tableName:"Images",
-      count: images.rows[0].count,
+      tableName: "Images",
+      count: imagesCount.count,
     });
   } catch (error) {
     res.status(400).json({

@@ -1,13 +1,9 @@
 const pool = require("../db");
 const uuid = require("uuid");
-const cloudinary = require("cloudinary");
-
-
- 
+const cloudinary = require("cloudinary").v2;
 
 exports.createVolunteer = async (req, res) => {
   try {
-    // Process user registration
     const {
       username,
       phonenumber,
@@ -18,28 +14,31 @@ exports.createVolunteer = async (req, res) => {
       linkedinurl,
       file,
     } = req.body;
-    const myCloud = await cloudinary.v2.uploader.upload(file, {
+    
+    const myCloud = await cloudinary.uploader.upload(file, {
       folder: "thepankh/volunteer",
-      Crop: "fill",
+      crop: "fill",
     });
+    
     const id = uuid.v4();
+    
     await pool.query(
-      "INSERT INTO volunteer (id,username,phonenumber,role,facebookurl,twitterurl,instagramurl,linkedinurl,fileid,fileurl,createdat) VALUES ($1, $2, $3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING *",
+      "INSERT INTO volunteer (id, username, phonenumber, role, facebookurl, twitterurl, instagramurl, linkedinurl, fileid, fileurl, createdat) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
       [
         id,
         username,
         phonenumber,
         role,
-        facebookurl === "" ? "https://facebook.com" : facebookurl,
-        twitterurl === "" ? "https://twitter.com" : twitterurl,
-        instagramurl === "" ? "https://instagram.com" : instagramurl,
-        linkedinurl === "" ? "https://linkedin.com" : linkedinurl,
+        facebookurl || "https://facebook.com",
+        twitterurl || "https://twitter.com",
+        instagramurl || "https://instagram.com",
+        linkedinurl || "https://linkedin.com",
         myCloud.public_id,
         myCloud.secure_url,
         new Date(),
       ]
     );
-    console.log("created");
+
     res.status(201).json({ success: true, msg: "Volunteer Created" });
   } catch (error) {
     console.error(error.message);
@@ -49,10 +48,10 @@ exports.createVolunteer = async (req, res) => {
 
 exports.getAllVolunteers = async (req, res) => {
   try {
-    const volunteers = await pool.query("SELECT * FROM volunteer");
+    const [volunteers] = await pool.query("SELECT * FROM volunteer");
     res.status(200).json({
       success: true,
-      volunteers: volunteers.rows,
+      volunteers,
     });
   } catch (error) {
     res.status(400).json({
@@ -66,18 +65,16 @@ exports.getAllVolunteers = async (req, res) => {
 exports.getVolunteerByID = async (req, res) => {
   try {
     const { id } = req.params;
-    const volunteer = await pool.query(
-      "SELECT * FROM volunteer WHERE id = $1",
+    const [volunteer] = await pool.query(
+      "SELECT * FROM volunteer WHERE id = ?",
       [id]
     );
-    if (volunteer.rows.length === 0) {
-      return res
-        .status(404)
-        .json({ success: false, msg: "Volunteer not found" });
+    if (volunteer.length === 0) {
+      return res.status(404).json({ success: false, msg: "Volunteer not found" });
     }
     res.status(200).json({
       success: true,
-      volunteer: volunteer.rows[0],
+      volunteer: volunteer[0],
     });
   } catch (error) {
     res.status(400).json({
@@ -91,23 +88,22 @@ exports.getVolunteerByID = async (req, res) => {
 exports.deleteVolunteer = async (req, res) => {
   try {
     const { id } = req.params;
-    const volunteer = await pool.query(
-      "SELECT * FROM volunteer WHERE id = $1",
+    const [volunteer] = await pool.query(
+      "SELECT * FROM volunteer WHERE id = ?",
       [id]
     );
 
-    if (volunteer.rows.length === 0) {
-      return res
-        .status(404)
-        .json({ success: false, msg: "Volunteer not found" });
-    } else {
-      const fileid = volunteer.rows[0].fileid;
-      await cloudinary.v2.uploader.destroy(fileid);
-      await pool.query("DELETE FROM volunteer WHERE id = $1", [id]);
+    if (volunteer.length === 0) {
+      return res.status(404).json({ success: false, msg: "Volunteer not found" });
     }
+
+    const fileid = volunteer[0].fileid;
+    await cloudinary.uploader.destroy(fileid);
+    await pool.query("DELETE FROM volunteer WHERE id = ?", [id]);
+
     res.status(200).json({
       success: true,
-      message: "Volunteer Deleted Succesfully",
+      message: "Volunteer Deleted Successfully",
     });
   } catch (error) {
     res.status(400).json({
@@ -121,52 +117,37 @@ exports.deleteVolunteer = async (req, res) => {
 exports.updateVolunteer = async (req, res) => {
   try {
     const { id } = req.params;
-    const {username,
-      phonenumber,
-      role,
-      facebookurl,
-      twitterurl,
-      instagramurl,
-      linkedinurl, file } = req.body;
-    const volunteer = await pool.query(
-      "SELECT * FROM Volunteer WHERE id = $1",
-      [id]
-    );
- 
-    if (volunteer.rows.length === 0) {
-      return res
-        .status(404)
-        .json({ success: false, msg: "volunteer not found" });
+    const { username, phonenumber, role, facebookurl, twitterurl, instagramurl, linkedinurl, file } = req.body;
+
+    const [volunteer] = await pool.query("SELECT * FROM volunteer WHERE id = ?", [id]);
+
+    if (volunteer.length === 0) {
+      return res.status(404).json({ success: false, msg: "Volunteer not found" });
     }
+
     if (file) {
-      const fileid = volunteer.rows[0].fileid;
-      await cloudinary.v2.uploader.destroy(fileid);
-      const myCloud = await cloudinary.v2.uploader.upload(file, {
+      const oldFileId = volunteer[0].fileid;
+      await cloudinary.uploader.destroy(oldFileId);
+
+      const myCloud = await cloudinary.uploader.upload(file, {
         folder: "thepankh/volunteer",
-        Crop: "fill",
+        crop: "fill",
       });
+
       await pool.query(
-        "UPDATE volunteer SET fileid = $1, fileurl = $2,username = $3,phonenumber = $4, role = $5,facebookurl = $6, twitterurl = $7,instagramurl = $8,linkedinurl = $9 WHERE id = $10",
-        [myCloud.public_id, myCloud.secure_url,username,phonenumber,role,facebookurl,twitterurl,instagramurl,linkedinurl, id]
+        "UPDATE volunteer SET fileid = ?, fileurl = ?, username = ?, phonenumber = ?, role = ?, facebookurl = ?, twitterurl = ?, instagramurl = ?, linkedinurl = ? WHERE id = ?",
+        [myCloud.public_id, myCloud.secure_url, username, phonenumber, role, facebookurl, twitterurl, instagramurl, linkedinurl, id]
       );
     } else {
       await pool.query(
-        "UPDATE volunteer SET username = $1,phonenumber = $2, role = $3,facebookurl = $4, twitterurl = $5,instagramurl = $6,linkedinurl = $7 WHERE id = $8",
-        [
-          username,
-          phonenumber,
-          role,
-          facebookurl,
-          twitterurl,
-          instagramurl,
-          linkedinurl, 
-          id
-        ]
+        "UPDATE volunteer SET username = ?, phonenumber = ?, role = ?, facebookurl = ?, twitterurl = ?, instagramurl = ?, linkedinurl = ? WHERE id = ?",
+        [username, phonenumber, role, facebookurl, twitterurl, instagramurl, linkedinurl, id]
       );
     }
+
     res.status(200).json({
       success: true,
-      message: "Volunteer Updated Succesfully",
+      message: "Volunteer Updated Successfully",
     });
   } catch (error) {
     res.status(400).json({
@@ -179,11 +160,11 @@ exports.updateVolunteer = async (req, res) => {
 
 exports.getAllVolunteerCount = async (req, res) => {
   try {
-    const volunteer = await pool.query("SELECT count(*) FROM volunteer");
+    const [[{ count }]] = await pool.query("SELECT COUNT(*) AS count FROM volunteer");
     res.status(200).json({
       success: true,
       tableName: "volunteer",
-      count: volunteer.rows[0].count,
+      count,
     });
   } catch (error) {
     res.status(400).json({

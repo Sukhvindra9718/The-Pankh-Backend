@@ -2,7 +2,6 @@ const pool = require("../db");
 const uuid = require("uuid");
 const cloudinary = require("cloudinary");
 
-
 // Projects CRUD
 exports.addProject = async (req, res) => {
   try {
@@ -11,10 +10,11 @@ exports.addProject = async (req, res) => {
 
     const myCloud = await cloudinary.v2.uploader.upload(file, {
       folder: "thepankh/projects",
-      Crop: "fill",
+      crop: "fill",
     });
+
     await pool.query(
-      "INSERT INTO projects (id,title,description,fileid,fileurl,createdat) VALUES ($1, $2, $3,$4,$5,$6) RETURNING *",
+      "INSERT INTO projects (id, title, description, fileid, fileurl, createdat) VALUES (?, ?, ?, ?, ?, ?)",
       [
         id,
         title,
@@ -27,30 +27,27 @@ exports.addProject = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "Project Uploaded Succesfully",
+      message: "Project Uploaded Successfully",
     });
   } catch (error) {
-    console.log(error)
-    res
-      .status(500)
-      .send({
-        success: false,
-        userError: "Server Error",
-        error: error.message,
-      });
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      userError: "Server Error",
+      error: error.message,
+    });
   }
 };
 
 exports.getAllProjects = async (req, res) => {
   try {
-    const projects = await pool.query("SELECT * FROM projects");
+    const [projects] = await pool.query("SELECT * FROM projects");
     res.status(200).json({
       success: true,
-      projects: projects.rows,
+      projects: projects,
     });
-
   } catch (error) {
-    res.status(200).json({
+    res.status(400).json({
       success: false,
       error: error.message,
       userError: "Projects fetch failed",
@@ -61,13 +58,13 @@ exports.getAllProjects = async (req, res) => {
 exports.getProject = async (req, res) => {
   try {
     const { id } = req.params;
-    const projects = await pool.query("SELECT * FROM projects WHERE id = $1", [id]);
-    if (projects.rows.length === 0) {
+    const [projects] = await pool.query("SELECT * FROM projects WHERE id = ?", [id]);
+    if (projects.length === 0) {
       return res.status(404).json({ success: false, msg: "Project not found" });
     }
     res.status(200).json({
       success: true,
-      projects: projects.rows[0],
+      projects: projects[0],
     });
   } catch (error) {
     res.status(400).json({
@@ -81,16 +78,16 @@ exports.getProject = async (req, res) => {
 exports.deleteProject = async (req, res) => {
   try {
     const { id } = req.params;
-    const projects = await pool.query("SELECT * FROM projects WHERE id = $1", [id]);
-    if (projects) {
-      const fileid = projects.rows[0].fileid;
+    const [projects] = await pool.query("SELECT * FROM projects WHERE id = ?", [id]);
+    if (projects.length > 0) {
+      const fileid = projects[0].fileid;
       await cloudinary.v2.uploader.destroy(fileid);
-      await pool.query("DELETE FROM projects WHERE id = $1", [id]);
+      await pool.query("DELETE FROM projects WHERE id = ?", [id]);
     }
 
     res.status(200).json({
       success: true,
-      message: "Project Deleted Succesfully",
+      message: "Project Deleted Successfully",
     });
   } catch (error) {
     res.status(400).json({
@@ -105,30 +102,30 @@ exports.updateProject = async (req, res) => {
   try {
     const { id } = req.params;
     const { title, description, file } = req.body;
-    const projects = await pool.query("SELECT * FROM projects WHERE id = $1", [id]);
-    if (projects.rows.length === 0) {
+    const [projects] = await pool.query("SELECT * FROM projects WHERE id = ?", [id]);
+    if (projects.length === 0) {
       return res.status(404).json({ success: false, msg: "Project not found" });
     }
     if (file) {
-      const fileid = projects.rows[0].fileid;
+      const fileid = projects[0].fileid;
       await cloudinary.v2.uploader.destroy(fileid);
       const myCloud = await cloudinary.v2.uploader.upload(file, {
         folder: "thepankh/projects",
-        Crop: "fill",
+        crop: "fill",
       });
       await pool.query(
-        "UPDATE projects SET fileid = $1, fileurl = $2,title = $3,description=$4 WHERE id = $5",
+        "UPDATE projects SET fileid = ?, fileurl = ?, title = ?, description = ? WHERE id = ?",
         [myCloud.public_id, myCloud.secure_url, title, description, id]
       );
     } else {
       await pool.query(
-        "UPDATE projects SET title = $1,description=$2 WHERE id = $3",
+        "UPDATE projects SET title = ?, description = ? WHERE id = ?",
         [title, description, id]
       );
     }
     res.status(200).json({
       success: true,
-      message: "Project Updated Succesfully",
+      message: "Project Updated Successfully",
     });
   } catch (error) {
     res.status(400).json({
@@ -141,11 +138,11 @@ exports.updateProject = async (req, res) => {
 
 exports.getAllProjectsCount = async (req, res) => {
   try {
-    const projects = await pool.query("SELECT count(*) FROM projects");
+    const [[projectsCount]] = await pool.query("SELECT COUNT(*) AS count FROM projects");
     res.status(200).json({
       success: true,
-      tableName:"Projects",
-      count: projects.rows[0].count,
+      tableName: "Projects",
+      count: projectsCount.count,
     });
   } catch (error) {
     res.status(400).json({

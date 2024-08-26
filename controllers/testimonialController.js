@@ -2,18 +2,16 @@ const pool = require("../db");
 const uuid = require("uuid");
 const cloudinary = require("cloudinary");
 
-
 exports.createTestimonial = async (req, res) => {
   try {
-    // Process user registration
     const { name, role, comment, file } = req.body;
     const myCloud = await cloudinary.v2.uploader.upload(file, {
       folder: "thepankh/testimonial",
-      Crop: "fill",
+      crop: "fill",
     });
     const id = uuid.v4();
     await pool.query(
-      "INSERT INTO testimonial (id,name,role,comment,fileid,fileurl,createdat) VALUES ($1, $2, $3,$4,$5,$6,$7) RETURNING *",
+      "INSERT INTO testimonial (id, name, role, comment, fileid, fileurl, createdat) VALUES (?, ?, ?, ?, ?, ?, ?)",
       [
         id,
         name,
@@ -33,10 +31,10 @@ exports.createTestimonial = async (req, res) => {
 
 exports.getAllTestimonial = async (req, res) => {
   try {
-    const testimonial = await pool.query("SELECT * FROM testimonial");
+    const [testimonial] = await pool.query("SELECT * FROM testimonial");
     res.status(200).json({
       success: true,
-      testimonial: testimonial.rows,
+      testimonial: testimonial,
     });
   } catch (error) {
     res.status(400).json({
@@ -50,15 +48,13 @@ exports.getAllTestimonial = async (req, res) => {
 exports.getTestimonialByID = async (req, res) => {
   try {
     const { id } = req.params;
-    const testimonial = await pool.query("SELECT * FROM testimonial WHERE id = $1", [id]);
-    if (testimonial.rows.length === 0) {
-      return res
-        .status(200)
-        .json({ success: false, msg: "Testimonial not found" });
+    const [testimonial] = await pool.query("SELECT * FROM testimonial WHERE id = ?", [id]);
+    if (testimonial.length === 0) {
+      return res.status(200).json({ success: false, msg: "Testimonial not found" });
     }
     res.status(200).json({
       success: true,
-      testimonial: testimonial.rows[0],
+      testimonial: testimonial[0],
     });
   } catch (error) {
     res.status(400).json({
@@ -72,20 +68,18 @@ exports.getTestimonialByID = async (req, res) => {
 exports.deleteTestimonial = async (req, res) => {
   try {
     const { id } = req.params;
-    const testimonial = await pool.query("SELECT * FROM testimonial WHERE id = $1", [id]);
+    const [testimonial] = await pool.query("SELECT * FROM testimonial WHERE id = ?", [id]);
 
-    if (testimonial.rows.length === 0) {
-      return res
-        .status(200)
-        .json({ success: false, msg: "Testimonial not found" });
+    if (testimonial.length === 0) {
+      return res.status(200).json({ success: false, msg: "Testimonial not found" });
     } else {
-      const fileid = testimonial.rows[0].fileid;
+      const fileid = testimonial[0].fileid;
       await cloudinary.v2.uploader.destroy(fileid);
-      await pool.query("DELETE FROM testimonial WHERE id = $1", [id]);
+      await pool.query("DELETE FROM testimonial WHERE id = ?", [id]);
     }
     res.status(200).json({
       success: true,
-      message: "Testimonial Deleted Succesfully",
+      message: "Testimonial Deleted Successfully",
     });
   } catch (error) {
     res.status(400).json({
@@ -99,26 +93,24 @@ exports.deleteTestimonial = async (req, res) => {
 exports.updateTestimonial = async (req, res) => {
   try {
     const { id } = req.params;
-    const {name, role, comment, file } = req.body;
-    const testimonial = await pool.query("SELECT * FROM testimonial WHERE id = $1", [id]);
-    if (testimonial.rows.length === 0) {
-      return res
-        .status(200)
-        .json({ success: false, msg: "Testimonial not found" });
+    const { name, role, comment, file } = req.body;
+    const [testimonial] = await pool.query("SELECT * FROM testimonial WHERE id = ?", [id]);
+    if (testimonial.length === 0) {
+      return res.status(200).json({ success: false, msg: "Testimonial not found" });
     }
     if (file) {
-      const fileid = testimonial.rows[0].fileid;
+      const fileid = testimonial[0].fileid;
       await cloudinary.v2.uploader.destroy(fileid);
       const myCloud = await cloudinary.v2.uploader.upload(file, {
         folder: "thepankh/testimonial",
-        Crop: "fill",
+        crop: "fill",
       });
       await pool.query(
-        "UPDATE testimonial SET fileid = $1, fileurl = $2,name = $3, role = $4, comment = $5 WHERE id = $6",
-        [myCloud.public_id, myCloud.secure_url,name,role,comment, id]
+        "UPDATE testimonial SET fileid = ?, fileurl = ?, name = ?, role = ?, comment = ? WHERE id = ?",
+        [myCloud.public_id, myCloud.secure_url, name, role, comment, id]
       );
     } else {
-      await pool.query("UPDATE testimonial SET name = $1,role = $2, comment = $3 WHERE id = $4", [
+      await pool.query("UPDATE testimonial SET name = ?, role = ?, comment = ? WHERE id = ?", [
         name, 
         role, 
         comment,
@@ -127,7 +119,7 @@ exports.updateTestimonial = async (req, res) => {
     }
     res.status(200).json({
       success: true,
-      message: "Testimonial Updated Succesfully",
+      message: "Testimonial Updated Successfully",
     });
   } catch (error) {
     res.status(400).json({
@@ -140,11 +132,11 @@ exports.updateTestimonial = async (req, res) => {
 
 exports.getAllTestimonialCount = async (req, res) => {
   try {
-    const testimonial = await pool.query("SELECT count(*) FROM testimonial");
+    const [[testimonialCount]] = await pool.query("SELECT COUNT(*) AS count FROM testimonial");
     res.status(200).json({
       success: true,
       tableName: "Testimonial",
-      count: testimonial.rows[0].count,
+      count: testimonialCount.count,
     });
   } catch (error) {
     res.status(400).json({

@@ -1,21 +1,19 @@
 const pool = require("../db");
 const fs = require("fs");
 const uuid = require("uuid");
-const cloudinary = require("cloudinary");
-
-
+const cloudinary = require("cloudinary").v2;
 
 exports.addVideo = async (req, res) => {
   try {
     const { title, description, url, file } = req.body;
     const id = uuid.v4();
-    const myCloud = await cloudinary.v2.uploader.upload(file, {
+    const myCloud = await cloudinary.uploader.upload(file, {
       folder: "thepankh/thumbnail",
       Crop: "fill",
     });
 
     await pool.query(
-      "INSERT INTO videos (id,title,description,url,fileid,fileurl,createdat) VALUES ($1, $2, $3,$4,$5,$6,$7) RETURNING *",
+      "INSERT INTO videos (id, title, description, url, fileid, fileurl, createdat) VALUES (?, ?, ?, ?, ?, ?, ?)",
       [
         id,
         title,
@@ -29,7 +27,7 @@ exports.addVideo = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "Video Uploaded Succesfully",
+      message: "Video Uploaded Successfully",
     });
   } catch (error) {
     res.status(500).send({
@@ -42,10 +40,10 @@ exports.addVideo = async (req, res) => {
 
 exports.getAllVideos = async (req, res) => {
   try {
-    const videos = await pool.query("SELECT * FROM videos");
+    const [videos] = await pool.query("SELECT * FROM videos");
     res.status(200).json({
       success: true,
-      videos: videos.rows,
+      videos,
     });
   } catch (error) {
     res.status(400).json({
@@ -59,13 +57,13 @@ exports.getAllVideos = async (req, res) => {
 exports.getVideo = async (req, res) => {
   try {
     const { id } = req.params;
-    const video = await pool.query("SELECT * FROM videos WHERE id = $1", [id]);
-    if (video.rows.length === 0) {
+    const [video] = await pool.query("SELECT * FROM videos WHERE id = ?", [id]);
+    if (video.length === 0) {
       return res.status(404).json({ success: false, msg: "Video not found" });
     }
     res.status(200).json({
       success: true,
-      video: video.rows[0],
+      video: video[0],
     });
   } catch (error) {
     res.status(400).json({
@@ -79,17 +77,17 @@ exports.getVideo = async (req, res) => {
 exports.deleteVideo = async (req, res) => {
   try {
     const { id } = req.params;
-    const video = await pool.query("SELECT * FROM videos WHERE id = $1", [id]);
-    if (video.rows.length === 0) {
-      return res.status(200).json({ success: false, msg: "Video not found" });
+    const [video] = await pool.query("SELECT * FROM videos WHERE id = ?", [id]);
+    if (video.length === 0) {
+      return res.status(404).json({ success: false, msg: "Video not found" });
     }
 
-    const fileid = video.rows[0].fileid;
-    await cloudinary.v2.uploader.destroy(fileid);
-    await pool.query("DELETE FROM videos WHERE id = $1", [id]);
+    const fileid = video[0].fileid;
+    await cloudinary.uploader.destroy(fileid);
+    await pool.query("DELETE FROM videos WHERE id = ?", [id]);
     res.status(200).json({
       success: true,
-      message: "Video Deleted Succesfully",
+      message: "Video Deleted Successfully",
     });
   } catch (error) {
     res.status(400).json({
@@ -103,41 +101,40 @@ exports.deleteVideo = async (req, res) => {
 exports.updateVideo = async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, description, url } = req.body;
-    const video = await pool.query("SELECT * FROM videos WHERE id = $1", [id]);
-    if (video.rows.length === 0) {
-      return res.status(200).json({ success: false, msg: "Video not found" });
+    const { title, description, url, file } = req.body;
+    const [video] = await pool.query("SELECT * FROM videos WHERE id = ?", [id]);
+    if (video.length === 0) {
+      return res.status(404).json({ success: false, msg: "Video not found" });
     }
 
-    if (req.file) {
-      const myCloud = await cloudinary.v2.uploader.upload(file, {
+    if (file) {
+      const myCloud = await cloudinary.uploader.upload(file, {
         folder: "thepankh/thumbnail",
         Crop: "fill",
       });
       await pool.query(
-        "INSERT INTO videos (id,title,description,url,fileid,fileurl,createdat) VALUES ($1, $2, $3,$4,$5,$6,$7) RETURNING *",
+        "UPDATE videos SET title = ?, description = ?, url = ?, fileid = ?, fileurl = ? WHERE id = ?",
         [
-          id,
           title,
           description,
           url,
           myCloud.public_id,
           myCloud.secure_url,
-          new Date(),
+          id,
         ]
       );
-      const fileid = video.rows[0].fileid;
-      await cloudinary.v2.uploader.destroy(fileid);
+      const oldFileId = video[0].fileid;
+      await cloudinary.uploader.destroy(oldFileId);
     } else {
       await pool.query(
-        "UPDATE videos SET title = $1,description = $2, url = $3 WHERE id = $4",
+        "UPDATE videos SET title = ?, description = ?, url = ? WHERE id = ?",
         [title, description, url, id]
       );
     }
 
     res.status(200).json({
       success: true,
-      message: "Videos Updated Succesfully",
+      message: "Video Updated Successfully",
     });
   } catch (error) {
     res.status(400).json({
@@ -147,13 +144,14 @@ exports.updateVideo = async (req, res) => {
     });
   }
 };
+
 exports.getAllVideosCount = async (req, res) => {
   try {
-    const videos = await pool.query("SELECT count(*) FROM videos");
+    const [[{ count }]] = await pool.query("SELECT COUNT(*) AS count FROM videos");
     res.status(200).json({
       success: true,
       tableName: "Videos",
-      count: videos.rows[0].count,
+      count,
     });
   } catch (error) {
     res.status(400).json({
