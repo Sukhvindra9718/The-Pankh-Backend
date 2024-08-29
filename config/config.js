@@ -14,7 +14,7 @@ module.exports = {
     password: 'SrjaSky@@9643@@thepankh',
   },
   jwtSecret: "thisissecretconversationroomdontinterfere",
-  PORT: 3000,
+  PORT: 3001,
   NODE_ENV: "production",
   SMTP_HOST: "smtp.gmail.com",
   SMTP_PORT: 465,
