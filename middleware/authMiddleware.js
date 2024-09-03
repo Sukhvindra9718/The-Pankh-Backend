@@ -5,11 +5,11 @@ const config = require('../config/config.js');
 const authenticationMiddleware = (req, res, next) => {
   // Get token from header
   let token;
-  const cookieIndex = req.rawHeaders[0].indexOf('Cookie');
+  const cookieIndex = req.rawHeaders.indexOf('Cookie');
 
   if (cookieIndex !== -1) {
       // Step 2: Get the value of the 'Cookie' header
-      const cookieHeader = rawHeaders[cookieIndex + 1];
+      const cookieHeader = req.rawHeaders[cookieIndex + 1];
   
       // Step 3: Parse the 'Cookie' header to extract the 'token'
       const cookies = cookieHeader.split('; ');
@@ -44,11 +44,11 @@ const authenticationMiddleware = (req, res, next) => {
 const superAdminMiddleware = (req, res, next) => {
   // Get token from header
   let token;
-  const cookieIndex = req.rawHeaders[0].indexOf('Cookie');
+  const cookieIndex = req.rawHeaders.indexOf('Cookie');
 
   if (cookieIndex !== -1) {
       // Step 2: Get the value of the 'Cookie' header
-      const cookieHeader = rawHeaders[cookieIndex + 1];
+      const cookieHeader = req.rawHeaders[cookieIndex + 1];
   
       // Step 3: Parse the 'Cookie' header to extract the 'token'
       const cookies = cookieHeader.split('; ');
@@ -85,11 +85,11 @@ const superAdminMiddleware = (req, res, next) => {
 const adminMiddleware = (req, res, next) => {
   // Get token from header
   let token;
-  const cookieIndex = req.rawHeaders[0].indexOf('Cookie');
+  const cookieIndex = req.rawHeaders.indexOf('Cookie');
 
   if (cookieIndex !== -1) {
       // Step 2: Get the value of the 'Cookie' header
-      const cookieHeader = rawHeaders[cookieIndex + 1];
+      const cookieHeader = req.rawHeaders[cookieIndex + 1];
   
       // Step 3: Parse the 'Cookie' header to extract the 'token'
       const cookies = cookieHeader.split('; ');
@@ -126,11 +126,10 @@ const verifyToken = (req, res, next) => {
 
   // Get token from header
   let token;
-  const cookieIndex = req.rawHeaders[0].indexOf('Cookie');
-
+  const cookieIndex = req.rawHeaders.indexOf('Cookie');
   if (cookieIndex !== -1) {
       // Step 2: Get the value of the 'Cookie' header
-      const cookieHeader = rawHeaders[cookieIndex + 1];
+      const cookieHeader = req.rawHeaders[cookieIndex + 1];
   
       // Step 3: Parse the 'Cookie' header to extract the 'token'
       const cookies = cookieHeader.split('; ');
@@ -143,7 +142,6 @@ const verifyToken = (req, res, next) => {
   } else {
     console.log('Cookie header not found');
   }
- 
   // Check if token doesn't exist
   if (!token) {
     return res.status(200).json({ success:false,msg: 'Authorization denied' });
