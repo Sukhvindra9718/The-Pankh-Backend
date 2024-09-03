@@ -136,19 +136,4 @@ exports.updateProject = async (req, res) => {
   }
 };
 
-exports.getAllProjectsCount = async (req, res) => {
-  try {
-    const [[projectsCount]] = await pool.query("SELECT COUNT(*) AS count FROM projects");
-    res.status(200).json({
-      success: true,
-      tableName: "Projects",
-      count: projectsCount.count,
-    });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      error: error.message,
-      userError: "Projects fetch failed",
-    });
-  }
-};
+

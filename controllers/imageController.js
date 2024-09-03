@@ -137,19 +137,3 @@ exports.updateImage = async (req, res) => {
   }
 };
 
-exports.getAllImagesCount = async (req, res) => {
-  try {
-    const [[imagesCount]] = await pool.query("SELECT COUNT(*) AS count FROM images");
-    res.status(200).json({
-      success: true,
-      tableName: "Images",
-      count: imagesCount.count,
-    });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      error: error.message,
-      userError: "Images fetch failed",
-    });
-  }
-};

@@ -3,7 +3,6 @@ const {
   getAllBankDetails,
   deleteBankDetails,
   updateBankDetails,
-  getAllBankDetailsCount,
 } = require("../controllers/BankDetailsController.js");
 const router = require("express").Router();
 const authMiddleware = require("../middleware/authMiddleware.js");
@@ -26,7 +25,6 @@ router.post(
 );
 
 router.get("/BankDetails", getAllBankDetails);
-router.get("/getBankDetails/count", getAllBankDetailsCount);
 
 router.delete(
   "/BankDetails/:id",

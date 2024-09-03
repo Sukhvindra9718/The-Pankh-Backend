@@ -13,7 +13,7 @@ exports.createEvents = async (req, res) => {
             crop: "fill",
         });
         await pool.query(
-            "INSERT INTO events (id, title, shortdescription, fileid, fileurl, createdat, eventsdatetime, link) VALUES (?, ?, ?, ?, ?, ?, ?, ?) RETURNING *",
+            "INSERT INTO events (id, title, shortdescription, fileid, fileurl, createdat, eventsdatetime, link) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
             [
                 id,
                 title.toLowerCase(),
@@ -120,19 +120,4 @@ exports.updateEvents = async (req, res) => {
     }
 };
 
-exports.getAllEventsCount = async (req, res) => {
-    try {
-        const [[eventsCount]] = await pool.query("SELECT COUNT(*) AS count FROM events");
-        res.status(200).json({
-            success: true,
-            tableName: "Events",
-            count: eventsCount.count,
-        });
-    } catch (error) {
-        res.status(400).json({
-            success: false,
-            error: error.message,
-            userError: "Events fetch failed",
-        });
-    }
-};
+

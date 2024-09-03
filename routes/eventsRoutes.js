@@ -1,4 +1,4 @@
-const { createEvents, getAllEvents, deleteEvents, updateEvents, getAllEventsCount } = require("../controllers/eventsController.js");
+const { createEvents, getAllEvents, deleteEvents, updateEvents } = require("../controllers/eventsController.js");
 const router = require("express").Router();
 const authMiddleware = require("../middleware/authMiddleware.js");
 
@@ -20,7 +20,7 @@ router.post(
 );
 
 router.get("/events", getAllEvents);
-router.get("/events/count", getAllEventsCount);
+
 router.delete(
   "/events/:id",
   authMiddleware.authenticationMiddleware,

@@ -158,19 +158,4 @@ exports.updateVolunteer = async (req, res) => {
   }
 };
 
-exports.getAllVolunteerCount = async (req, res) => {
-  try {
-    const [[{ count }]] = await pool.query("SELECT COUNT(*) AS count FROM volunteer");
-    res.status(200).json({
-      success: true,
-      tableName: "volunteer",
-      count,
-    });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      error: error.message,
-      userError: "Volunteer fetch failed",
-    });
-  }
-};
+

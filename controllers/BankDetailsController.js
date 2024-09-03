@@ -13,7 +13,7 @@ exports.createBankDetails = async (req, res) => {
             crop: "fill",
         });
         await pool.query(
-            "INSERT INTO bankdetails (id, fileid, fileurl, createdat, ifsccode, accountnumber, branchname, upiid) VALUES (?, ?, ?, ?, ?, ?, ?, ?) RETURNING *",
+            "INSERT INTO bankdetails (id, fileid, fileurl, createdat, ifsccode, accountnumber, branchname, upiid) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
             [
                 id,
                 myCloud.public_id,
@@ -136,19 +136,4 @@ exports.updateBankDetails = async (req, res) => {
     }
 };
 
-exports.getAllBankDetailsCount = async (req, res) => {
-    try {
-        const [[BankDetails]] = await pool.query("SELECT COUNT(*) AS count FROM bankdetails");
-        res.status(200).json({
-            success: true,
-            tableName: "BankDetails",
-            count: BankDetails.count,
-        });
-    } catch (error) {
-        res.status(400).json({
-            success: false,
-            error: error.message,
-            userError: "BankDetails fetch failed",
-        });
-    }
-};
+

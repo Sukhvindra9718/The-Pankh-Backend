@@ -56,7 +56,7 @@ exports.getBannerByName = async (req, res) => {
             [name]
         );
         if (banner.length === 0) {
-            return res.status(404).json({ success: false, msg: "Banner not found" });
+            return res.status(200).json({ success: false, msg: "Banner not found" });
         }
         res.status(200).json({
             success: true,
@@ -136,20 +136,3 @@ exports.updateBanner = async (req, res) => {
     }
 };
 
-// Get All Banner Count
-exports.getAllBannerCount = async (req, res) => {
-    try {
-        const [[bannerCount]] = await pool.query("SELECT COUNT(*) AS count FROM banner");
-        res.status(200).json({
-            success: true,
-            tableName: "Banner",
-            count: bannerCount.count,
-        });
-    } catch (error) {
-        res.status(400).json({
-            success: false,
-            error: error.message,
-            userError: "Banner fetch failed",
-        });
-    }
-};

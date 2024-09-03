@@ -8,7 +8,7 @@ const registerContactUs = async (req, res) => {
     const id = uuid.v4();
 
     await pool.query(
-      "INSERT INTO contactus (id, name, email, phone, subject, message, createdat) VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING *",
+      "INSERT INTO contactus (id, name, email, phone, subject, message, createdat) VALUES (?, ?, ?, ?, ?, ?, ?)",
       [id, Name, Email, Phone, Subject, Message, new Date()]
     );
     res.status(201).json({
@@ -68,22 +68,6 @@ const deleteContactUs = async (req, res) => {
   }
 };
 
-const getAllContactUsCount = async (req, res) => {
-  try {
-    const [rows] = await pool.query("SELECT COUNT(*) AS count FROM contactus");
-    res.status(200).json({
-      success: true,
-      tableName: "Contact Us",
-      count: rows[0].count,
-    });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      error: error.message,
-      userError: "Contactus fetch failed",
-    });
-  }
-};
 
 // Key Contact Form
 const addKeyContact = async (req, res) => {
@@ -91,7 +75,7 @@ const addKeyContact = async (req, res) => {
     const { name, email, phone, organization, designation } = req.body;
     const id = uuid.v4();
     await pool.query(
-      "INSERT INTO keycontact (id, name, email, phone, organization, designation) VALUES (?, ?, ?, ?, ?, ?) RETURNING *",
+      "INSERT INTO keycontact (id, name, email, phone, organization, designation) VALUES (?, ?, ?, ?, ?, ?)",
       [id, name, email, phone, organization, designation]
     );
     res.status(201).json({
@@ -176,22 +160,6 @@ const updateKeyContact = async (req, res) => {
   }
 };
 
-const getAllkeyContactCount = async (req, res) => {
-  try {
-    const [rows] = await pool.query("SELECT COUNT(*) AS count FROM keycontact");
-    res.status(200).json({
-      success: true,
-      tableName: "Key Contacts",
-      count: rows[0].count,
-    });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      error: error.message,
-      userError: "Key contact fetch failed",
-    });
-  }
-};
 
 // Properties Access Controllers
 const addPropertiesAccess = async (req, res) => {
@@ -349,12 +317,10 @@ module.exports = {
   getContactUsById,
   deleteContactUs,
   addKeyContact,
-  getAllContactUsCount,
   getAllKeyContact,
   getKeyContactById,
   deleteKeyContact,
   updateKeyContact,
-  getAllkeyContactCount,
   addPropertiesAccess,
   UpdatePropertiesAccess,
   getAllPropertiesAccess,

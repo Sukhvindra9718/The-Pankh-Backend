@@ -1,4 +1,4 @@
-const { createNews, getAllNews, deleteNews, updateNews, getAllNewsCount, getTopTwoNews } = require("../controllers/newsController.js");
+const { createNews, getAllNews, deleteNews, updateNews, getTopTwoNews } = require("../controllers/newsController.js");
 const router = require("express").Router();
 const authMiddleware = require("../middleware/authMiddleware.js");
 
@@ -36,6 +36,5 @@ router.put(
   updateNews
 );
 
-router.get("/countNews/count", authMiddleware.authenticationMiddleware,
-  authMiddleware.superAdminMiddleware, getAllNewsCount);
+
 module.exports = router;

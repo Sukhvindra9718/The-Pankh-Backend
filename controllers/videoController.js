@@ -145,19 +145,3 @@ exports.updateVideo = async (req, res) => {
   }
 };
 
-exports.getAllVideosCount = async (req, res) => {
-  try {
-    const [[{ count }]] = await pool.query("SELECT COUNT(*) AS count FROM videos");
-    res.status(200).json({
-      success: true,
-      tableName: "Videos",
-      count,
-    });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      error: error.message,
-      userError: "Videos fetch failed",
-    });
-  }
-};

@@ -143,19 +143,4 @@ exports.updateNews = async (req, res) => {
   }
 };
 
-exports.getAllNewsCount = async (req, res) => {
-  try {
-    const [[newsCount]] = await pool.query("SELECT COUNT(*) AS count FROM news");
-    res.status(200).json({
-      success: true,
-      tableName: "news",
-      count: newsCount.count,
-    });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      error: error.message,
-      userError: "News count fetch failed",
-    });
-  }
-};
+

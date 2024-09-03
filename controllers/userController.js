@@ -99,22 +99,7 @@ const getAllUsers = async (req, res) => {
   }
 };
 
-const getAllUserCount = async (req, res) => {
-  try {
-    const [[userCount]] = await pool.query("SELECT COUNT(*) AS count FROM users");
-    res.status(200).json({
-      success: true,
-      tableName: "Users",
-      count: userCount.count,
-    });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      error: error.message,
-      userError: "Users fetch failed",
-    });
-  }
-};
+
 
 module.exports = {
   getUserById,
@@ -122,5 +107,4 @@ module.exports = {
   updateUser,
   deleteUser,
   getAllUsers,
-  getAllUserCount,
 };

@@ -1,4 +1,4 @@
-const {addProject,getAllProjects,getAllProjectsCount,updateProject,deleteProject  } = require("../controllers/projectController.js");
+const {addProject,getAllProjects,updateProject,deleteProject  } = require("../controllers/projectController.js");
 const router = require("express").Router();
 const authMiddleware = require("../middleware/authMiddleware.js");
 
@@ -35,6 +35,4 @@ router.put(
   updateProject
 );
 
-router.get("/countProjects/count", authMiddleware.authenticationMiddleware,
-  authMiddleware.superAdminMiddleware, getAllProjectsCount);
 module.exports = router;

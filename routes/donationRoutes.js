@@ -1,4 +1,4 @@
-const { createDonation, getAllDonation, deleteDonation, updateDonation,getAllDonationCount } = require("../controllers/donationController.js");
+const { createDonation, getAllDonation, deleteDonation, updateDonation } = require("../controllers/donationController.js");
 const router = require("express").Router();
 const authMiddleware = require("../middleware/authMiddleware.js");
 
@@ -20,7 +20,6 @@ router.post(
 );
 
 router.get("/Donations", getAllDonation);
-router.get("/Donations/count", getAllDonationCount);
 
 router.delete(
   "/Donation/:id",

@@ -14,7 +14,7 @@ exports.createDonation = async (req, res) => {
             crop: "fill",
         });
         await pool.query(
-            "INSERT INTO donations (id, fileid, fileurl, createdat, fullname, email, phonenumber, country, amount, utrnumber, donationdatetime, remarks) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING *",
+            "INSERT INTO donations (id, fileid, fileurl, createdat, fullname, email, phonenumber, country, amount, utrnumber, donationdatetime, remarks) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             [
                 id,
                 myCloud.public_id,
@@ -149,19 +149,3 @@ exports.updateDonation = async (req, res) => {
     }
 };
 
-exports.getAllDonationCount = async (req, res) => {
-    try {
-        const [[donationCount]] = await pool.query("SELECT COUNT(*) AS count FROM donations");
-        res.status(200).json({
-            success: true,
-            tableName: "Donations",
-            count: donationCount.count,
-        });
-    } catch (error) {
-        res.status(400).json({
-            success: false,
-            error: error.message,
-            userError: "Donation fetch failed",
-        });
-    }
-};

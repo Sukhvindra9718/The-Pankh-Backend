@@ -130,19 +130,4 @@ exports.updateTestimonial = async (req, res) => {
   }
 };
 
-exports.getAllTestimonialCount = async (req, res) => {
-  try {
-    const [[testimonialCount]] = await pool.query("SELECT COUNT(*) AS count FROM testimonial");
-    res.status(200).json({
-      success: true,
-      tableName: "Testimonial",
-      count: testimonialCount.count,
-    });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      error: error.message,
-      userError: "Testimonial fetch failed",
-    });
-  }
-};
+

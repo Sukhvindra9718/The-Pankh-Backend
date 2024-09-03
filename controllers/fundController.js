@@ -14,7 +14,7 @@ exports.addFundDetails = async (req, res) => {
             crop: "fill",
         });
         await pool.query(
-            "INSERT INTO fund (id, title, raisedprice, goalprice, description, createdat, fileurl, fileid) VALUES (?, ?, ?, ?, ?, ?, ?, ?) RETURNING *",
+            "INSERT INTO fund (id, title, raisedprice, goalprice, description, createdat, fileurl, fileid) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
             [
                 id,
                 title,
@@ -141,19 +141,3 @@ exports.updateFundDetails = async (req, res) => {
     }
 };
 
-exports.getAllFundDetailsCount = async (req, res) => {
-    try {
-        const [[fundCount]] = await pool.query("SELECT COUNT(*) AS count FROM fund");
-        res.status(200).json({
-            success: true,
-            tableName: "fund",
-            count: fundCount.count,
-        });
-    } catch (error) {
-        res.status(400).json({
-            success: false,
-            error: error.message,
-            userError: "Fund Details count fetch failed",
-        });
-    }
-};

@@ -62,7 +62,7 @@ exports.getCarousalByID = async (req, res) => {
         const [carousal] = await pool.query("SELECT * FROM carousal WHERE id = ?", [id]);
         if (carousal.length === 0) {
             return res
-                .status(404)
+                .status(200)
                 .json({ success: false, msg: "Carousal not found" });
         }
         res.status(200).json({
@@ -146,19 +146,4 @@ exports.updateCarousal = async (req, res) => {
     }
 };
 
-exports.getAllCarousalCount = async (req, res) => {
-    try {
-        const [[carousalCount]] = await pool.query("SELECT COUNT(*) AS count FROM carousal");
-        res.status(200).json({
-            success: true,
-            tableName: "Carousal",
-            count: carousalCount.count,
-        });
-    } catch (error) {
-        res.status(400).json({
-            success: false,
-            error: error.message,
-            userError: "Carousal fetch failed",
-        });
-    }
-};
+

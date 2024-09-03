@@ -4,7 +4,6 @@ const {
   deleteBanner,
   getBannerByName,
   updateBanner,
-  getAllBannerCount,
 } = require("../controllers/bannerController");
 const router = require("express").Router();
 const authMiddleware = require("../middleware/authMiddleware.js");
@@ -34,12 +33,7 @@ router.put(
   authMiddleware.superAdminMiddleware,
   updateBanner
 );
-router.get(
-  "/getbanner/count",
-  authMiddleware.authenticationMiddleware,
-  authMiddleware.superAdminMiddleware,
-  getAllBannerCount
-);
+
 
 // Admin middleware
 router.post(
@@ -66,12 +60,7 @@ router.put(
   authMiddleware.adminMiddleware,
   updateBanner
 );
-router.get(
-  "/getbanner/count",
-  authMiddleware.authenticationMiddleware,
-  authMiddleware.adminMiddleware,
-  getAllBannerCount
-);
+
 
 router.get("/banner/:name", getBannerByName);
 
