@@ -4,8 +4,24 @@ const config = require('../config/config.js');
 
 const authenticationMiddleware = (req, res, next) => {
   // Get token from header
-  const token = req.header('Authorization');
+  let token;
+  const cookieIndex = req.rawHeaders[0].indexOf('Cookie');
 
+  if (cookieIndex !== -1) {
+      // Step 2: Get the value of the 'Cookie' header
+      const cookieHeader = rawHeaders[cookieIndex + 1];
+  
+      // Step 3: Parse the 'Cookie' header to extract the 'token'
+      const cookies = cookieHeader.split('; ');
+  
+      cookies.forEach(cookie => {
+          if (cookie.startsWith('token=')) {
+              token = cookie.split('=')[1];
+          }
+      });
+  } else {
+    console.log('Cookie header not found');
+  }
   // Check if token doesn't exist
   if (!token) {
     return res.status(401).json({ msg: 'Authorization denied' });
@@ -27,7 +43,24 @@ const authenticationMiddleware = (req, res, next) => {
 
 const superAdminMiddleware = (req, res, next) => {
   // Get token from header
-  const token = req.header('Authorization');
+  let token;
+  const cookieIndex = req.rawHeaders[0].indexOf('Cookie');
+
+  if (cookieIndex !== -1) {
+      // Step 2: Get the value of the 'Cookie' header
+      const cookieHeader = rawHeaders[cookieIndex + 1];
+  
+      // Step 3: Parse the 'Cookie' header to extract the 'token'
+      const cookies = cookieHeader.split('; ');
+  
+      cookies.forEach(cookie => {
+          if (cookie.startsWith('token=')) {
+              token = cookie.split('=')[1];
+          }
+      });
+  } else {
+    console.log('Cookie header not found');
+  }
 
   // Check if token doesn't exist
   if (!token) {
@@ -51,7 +84,24 @@ const superAdminMiddleware = (req, res, next) => {
 
 const adminMiddleware = (req, res, next) => {
   // Get token from header
-  const token = req.header('Authorization');
+  let token;
+  const cookieIndex = req.rawHeaders[0].indexOf('Cookie');
+
+  if (cookieIndex !== -1) {
+      // Step 2: Get the value of the 'Cookie' header
+      const cookieHeader = rawHeaders[cookieIndex + 1];
+  
+      // Step 3: Parse the 'Cookie' header to extract the 'token'
+      const cookies = cookieHeader.split('; ');
+  
+      cookies.forEach(cookie => {
+          if (cookie.startsWith('token=')) {
+              token = cookie.split('=')[1];
+          }
+      });
+  } else {
+    console.log('Cookie header not found');
+  }
   // Check if token doesn't exist
   if (!token) {
     return res.status(401).json({ msg: 'Authorization denied' });
@@ -75,7 +125,24 @@ const adminMiddleware = (req, res, next) => {
 const verifyToken = (req, res, next) => {
 
   // Get token from header
-  const token = req.header('Authorization');
+  let token;
+  const cookieIndex = req.rawHeaders[0].indexOf('Cookie');
+
+  if (cookieIndex !== -1) {
+      // Step 2: Get the value of the 'Cookie' header
+      const cookieHeader = rawHeaders[cookieIndex + 1];
+  
+      // Step 3: Parse the 'Cookie' header to extract the 'token'
+      const cookies = cookieHeader.split('; ');
+  
+      cookies.forEach(cookie => {
+          if (cookie.startsWith('token=')) {
+              token = cookie.split('=')[1];
+          }
+      });
+  } else {
+    console.log('Cookie header not found');
+  }
  
   // Check if token doesn't exist
   if (!token) {
