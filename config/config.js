@@ -1,10 +1,14 @@
 // config.js
 module.exports = {
   database: {
-    user: 'root',
-    host: 'localhost',
-    database: 'thepankh',
-    password: 'SrjaSky@@9643@@thepankh@@artithapa',
+    user: 'u325002328_root',
+    host: 'srv1494.hstgr.io',
+    database: 'u325002328_thepankh',
+    password: 'SrjaSky@@9643@@thepankh',
+    // user: 'root',
+    // host: 'localhost',
+    // database: 'thepankh',
+    // password: 'SrjaSky@@9643@@thepankh@@artithapa',
   },
   jwtSecret: "thisissecretconversationroomdontinterfere",
   PORT: 3001,

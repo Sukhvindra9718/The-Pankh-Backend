@@ -3,25 +3,18 @@ const jwt = require('jsonwebtoken');
 const config = require('../config/config.js');
 
 const authenticationMiddleware = (req, res, next) => {
-  // Get token from header
-  let token;
-  const cookieIndex = req.rawHeaders.indexOf('Cookie');
+ // Get token from header
+ let token;
+  
+ // Step 3: Parse the 'Cookie' header to extract the 'token'
+ const cookies = req.headers.cookie.split('; ');
 
-  if (cookieIndex !== -1) {
-      // Step 2: Get the value of the 'Cookie' header
-      const cookieHeader = req.rawHeaders[cookieIndex + 1];
-  
-      // Step 3: Parse the 'Cookie' header to extract the 'token'
-      const cookies = cookieHeader.split('; ');
-  
-      cookies.forEach(cookie => {
-          if (cookie.startsWith('token=')) {
-              token = cookie.split('=')[1];
-          }
-      });
-  } else {
-    console.log('Cookie header not found');
-  }
+ cookies.forEach(cookie => {
+    if(cookie.startsWith('token=')) {
+      token = cookie.split('=')[1];
+    }
+ });
+
   // Check if token doesn't exist
   if (!token) {
     return res.status(401).json({ msg: 'Authorization denied' });
@@ -44,23 +37,16 @@ const authenticationMiddleware = (req, res, next) => {
 const superAdminMiddleware = (req, res, next) => {
   // Get token from header
   let token;
-  const cookieIndex = req.rawHeaders.indexOf('Cookie');
-
-  if (cookieIndex !== -1) {
-      // Step 2: Get the value of the 'Cookie' header
-      const cookieHeader = req.rawHeaders[cookieIndex + 1];
   
       // Step 3: Parse the 'Cookie' header to extract the 'token'
-      const cookies = cookieHeader.split('; ');
+  const cookies = req.headers.cookie.split('; ');
   
-      cookies.forEach(cookie => {
-          if (cookie.startsWith('token=')) {
-              token = cookie.split('=')[1];
-          }
-      });
-  } else {
-    console.log('Cookie header not found');
-  }
+  cookies.forEach(cookie => {
+    if (cookie.startsWith('token=')) {
+      token = cookie.split('=')[1];
+    }
+  });
+
 
   // Check if token doesn't exist
   if (!token) {
@@ -83,25 +69,18 @@ const superAdminMiddleware = (req, res, next) => {
 };
 
 const adminMiddleware = (req, res, next) => {
-  // Get token from header
-  let token;
-  const cookieIndex = req.rawHeaders.indexOf('Cookie');
+ // Get token from header
+ let token;
+  
+ // Step 3: Parse the 'Cookie' header to extract the 'token'
+ const cookies = req.headers.cookie.split('; ');
 
-  if (cookieIndex !== -1) {
-      // Step 2: Get the value of the 'Cookie' header
-      const cookieHeader = req.rawHeaders[cookieIndex + 1];
-  
-      // Step 3: Parse the 'Cookie' header to extract the 'token'
-      const cookies = cookieHeader.split('; ');
-  
-      cookies.forEach(cookie => {
-          if (cookie.startsWith('token=')) {
-              token = cookie.split('=')[1];
-          }
-      });
-  } else {
-    console.log('Cookie header not found');
+ cookies.forEach(cookie => {
+  if (cookie.startsWith('token=')) {
+    token = cookie.split('=')[1];
   }
+ });
+
   // Check if token doesn't exist
   if (!token) {
     return res.status(401).json({ msg: 'Authorization denied' });
@@ -126,22 +105,16 @@ const verifyToken = (req, res, next) => {
 
   // Get token from header
   let token;
-  const cookieIndex = req.rawHeaders.indexOf('Cookie');
-  if (cookieIndex !== -1) {
-      // Step 2: Get the value of the 'Cookie' header
-      const cookieHeader = req.rawHeaders[cookieIndex + 1];
   
-      // Step 3: Parse the 'Cookie' header to extract the 'token'
-      const cookies = cookieHeader.split('; ');
+  // Step 3: Parse the 'Cookie' header to extract the 'token'
+  const cookies = req.headers.cookie.split('; ');
   
-      cookies.forEach(cookie => {
-          if (cookie.startsWith('token=')) {
-              token = cookie.split('=')[1];
-          }
-      });
-  } else {
-    console.log('Cookie header not found');
-  }
+  cookies.forEach(cookie => {
+    if (cookie.startsWith('token=')) {
+      token = cookie.split('=')[1];
+    }
+  });
+
   // Check if token doesn't exist
   if (!token) {
     return res.status(200).json({ success:false,msg: 'Authorization denied' });
@@ -152,6 +125,7 @@ const verifyToken = (req, res, next) => {
     const decoded = jwt.verify(token, config.jwtSecret);
     res.status(200).json({ success:true,msg: 'User is authorized' });
   } catch (err) {
+    console.log(err)
     res.status(200).json({ success:false,msg: 'Token is not valid' });
   }
 };

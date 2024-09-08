@@ -10,11 +10,20 @@ const cookieParser = require("cookie-parser");
 const os = require("os");
 const host = os.hostname();
 const cloudinary = require("cloudinary");
+const pool = require("./db")
 
+const allowedOrigins = ['https://thepankh.info', 'https://www.thepankh.info','http://localhost:3000'];
 
-
-app.use(cors({ origin: "https://thepankh.info" }));
-app.use(express.json({ limit: "50mb" }));
+app.use(cors({
+    origin: function (origin, callback) {
+        if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    }
+}));
+app.use(express.json({ limit: "100mb" }));
 
 // Import Routes
 app.use("/api/auth", require("./routes/authRoutes"));
@@ -56,7 +65,10 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../html', 'index.html'));
 });
 
-
+pool.on("error", (err) => {
+  console.error("Unexpected error on idle client", err);
+  process.exit(-1);
+});
 const server = app.listen(PORT, (req, res) => {
   console.log(`Server is working on ${host}:${PORT}`);
 });
