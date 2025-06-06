@@ -60,12 +60,12 @@ process.on("uncaughtException", (err) => {
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, '../html')));
+app.use(express.static(path.join(__dirname, './build')));
 
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../html', 'index.html'));
+  res.sendFile(path.join(__dirname, './build', 'index.html'));
 });
-
+console.log(path.join(__dirname, './build', 'index.html'));
 pool.on("error", (err) => {
   console.error("Unexpected error on idle client", err);
   process.exit(-1);
