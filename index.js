@@ -13,7 +13,7 @@ const cloudinary = require("cloudinary");
 const pool = require("./db")
 const dotenv = require("dotenv");
 dotenv.config({ path: "./config/config.env" });
-const allowedOrigins = ['https://thepankh.info', 'https://www.thepankh.info','http://localhost:3000'];
+const allowedOrigins = ['https://thepankh.info', 'https://www.thepankh.info','http://localhost:3001','https://the-pankh-backend.onrender.com'];
 
 app.use(cors({
     origin: function (origin, callback) {
